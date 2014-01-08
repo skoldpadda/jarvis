@@ -148,6 +148,63 @@ class JarvisTaskBarIcon(wx.TaskBarIcon):
 
 
 	
+class ControlPanel(wx.Dialog):
+
+	def __init__(self, parent, ID, title, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+
+		super(ControlPanel, self).__init__(parent, ID, title=title, size=size, pos=pos, style=style)
+
+		icon = JarvisIcon.GetIcon()
+		self.SetIcon(icon)
+
+		# Now continue with the normal construction of the dialog
+		# contents
+		sizer = wx.BoxSizer(wx.VERTICAL)
+
+		label = wx.StaticText(self, -1, "Work In Progress")
+		sizer.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+		box = wx.BoxSizer(wx.HORIZONTAL)
+
+		label = wx.StaticText(self, -1, "Field #1:")
+		box.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+		text = wx.TextCtrl(self, -1, "", size=(80,-1))
+		box.Add(text, 1, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+		sizer.Add(box, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+
+		box = wx.BoxSizer(wx.HORIZONTAL)
+
+		label = wx.StaticText(self, -1, "Field #2:")
+		box.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+		text = wx.TextCtrl(self, -1, "", size=(80,-1))
+		box.Add(text, 1, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+		sizer.Add(box, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+
+		line = wx.StaticLine(self, -1, size=(20,-1), style=wx.LI_HORIZONTAL)
+		sizer.Add(line, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.TOP, 5)
+
+		btnsizer = wx.StdDialogButtonSizer()
+		
+		if wx.Platform != "__WXMSW__":
+			btn = wx.ContextHelpButton(self)
+			btnsizer.AddButton(btn)
+		
+		btn = wx.Button(self, wx.ID_OK)
+		btn.SetDefault()
+		btnsizer.AddButton(btn)
+
+		btn = wx.Button(self, wx.ID_CANCEL)
+		btnsizer.AddButton(btn)
+		btnsizer.Realize()
+
+		sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+
+		self.SetSizer(sizer)
+		sizer.Fit(self)
 
 
 
@@ -226,8 +283,14 @@ class Shell(wx.Frame):
 
 		box.Add(inbox, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
 
-	def JarvisButtonClicked(self,event):
-		pass
+	def JarvisButtonClicked(self, event):
+		dlg = ControlPanel(self, -1, 'Control Panel', size=(350, 200))
+		dlg.CenterOnScreen()
+
+		# This does not return until the dialog is closed
+		val = dlg.ShowModal()
+
+		dlg.Destroy()
 
 	def InitUI(self):
 		panel = wx.Panel(self)
