@@ -6,7 +6,7 @@ from __future__ import print_function
 import wx
 import wx.richtext as rt
 import datetime
-import sys, os, shlex
+import sys, os, shlex, subprocess
 
 import socket # For user computer name
 
@@ -29,7 +29,7 @@ themes = {}
 DEBUG = True
 
 
-# Get a hook to the system shell
+# Get a hook to the system shell -- TODO: This might not actually be needed
 if sys.platform == 'win32':
 	SHELL = 'cmd.exe'
 else:
@@ -37,6 +37,25 @@ else:
 		SHELL = os.environ['SHELL']
 	else:
 		SHELL = '/bin/sh'
+
+
+
+
+
+current_directory = os.path.expanduser('~')
+
+class directory:
+	"""Context manager for changing the current working directory"""
+	def __init__(self, newPath):
+		self.newPath = newPath
+
+	def __enter__(self):
+		self.savedPath = os.getcwd()
+		os.chdir(self.newPath)
+
+	def __exit__(self, etype, value, traceback):
+		os.chdir(self.savedPath)
+
 
 
 
@@ -60,6 +79,14 @@ def populatePlugins():
 	for f in os.listdir('plugins'):
 		if f.endswith('.py') and not '__init__' in f and not f.startswith('_'):
 			loadPlugin(f[:-3])
+
+# TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
+def cd(args):
+	global current_directory
+	with directory(current_directory):
+		os.chdir(args[0])
+		current_directory = os.getcwd()
+	wx.GetApp().frame.SetTitle('Jarvis - {}'.format(current_directory))
 
 def help(args):
 	print('help')
@@ -86,6 +113,7 @@ def populateThemes():
 
 # A dictionary of commands in this file
 builtins = {
+	'cd': cd,
 	'help': help,
 	'history': history,
 }
@@ -100,22 +128,36 @@ def runCommand(command, args):
 		builtins[command](args)
 		return
 
-	# If it's not recognized, we attempt to load it, then fail if THAT doesn't work
-	if command not in plugins:
-		if not loadPlugin(command):
-			print('Unrecognized command "{}"'.format(command))
-			return
+	# If it's a plugin, run it
+	if command in plugins:
+		plugins[command].run(args)
+		return
 
-	# Finally run it!
-	plugins[command].run(args)
+	# Maybe it by chance hasn't been loaded?
+	if loadPlugin(command):
+		plugins[command].run(args)
+		return
+
+	# Attempt to pass the command off to the underlying OS
+	# TODO: Error checking! (does command exist?)
+	with directory(current_directory):
+		subprocess.call([command] + args)
+
+	# Okay...we really don't know what to do
+	print('Unrecognized command "{}"'.format(command))
+
+
 
 	#TODO:
-	# 1. If command not in plugins, attempt to load it. If that succeeds, run and return.
 	# 2. Attempt to pass the command off to the underlying shell. If that succeeds, return.
 	# 3. Interpret command semantically. This could include conversationally, etc.
 
 
 	
+
+
+
+
 
 
 
@@ -302,8 +344,6 @@ class Shell(wx.Frame):
 
 	# IMPORTANT: Remember that WriteText() will print a newline if given an empty string!!! (yeah this is stupid)
 	def WriteMessage(self, out, tag, tag_color, message):
-		#print(repr(message), file=sys.stderr)
-
 		out.SetInsertionPointEnd()
 
 		if tag:
@@ -364,8 +404,6 @@ class Shell(wx.Frame):
 		#theme = default
 		#self.RefreshTheme()
 
-		#self.SetTitle('Jarvis - {}'.format(self.intc.GetValue()))
-
 		uin = self.intc.GetValue()
 		self.intc.SetValue('')
 
@@ -399,7 +437,7 @@ class SysOutListener:
 
 class JarvisApp(wx.App):
 	def OnInit(self):
-		self.frame = Shell(None, title='Jarvis')
+		self.frame = Shell(None, title='Jarvis - {}'.format(current_directory))
 		self.frame.Show(True)
 		self.frame.Center()
 		return True
