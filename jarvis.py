@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import datetime
 import sys
 import os
 import shlex
 import subprocess
 import socket  # For user computer name
-from __future__ import print_function
 
 import wx
 import wx.richtext as rt
 from wx.lib.embeddedimage import PyEmbeddedImage
 from wx.lib.newevent import NewEvent
+
+from thememanager import ThemeManager
 
 
 # Rebinding stdout so that any print() messages go into Jarvis window as well...
@@ -22,13 +25,10 @@ wxStdOut, EVT_STDDOUT = NewEvent()
 # A dictionary of plugins that Jarvis knows about
 plugins = {}
 
-# A dictionary of themes that Jarvis knows about
-themes = {}
-
-# TODO: Things like this should be in a global config .py file, not here.
+# @TODO: Things like this should be in a global config .py file, not here.
 DEBUG = True
 
-# TODO: Save current directory?
+# @TODO: Save current directory?
 current_directory = os.path.expanduser('~')
 
 
@@ -47,7 +47,7 @@ class directory:
 
 
 
-#TODO: Should this go here?
+# @TODO: Should this go here?
 JarvisIcon = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAm"
     "pwYAAADGGlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjaY2BgnuDo4uTKJMDAUFBUUu"
@@ -94,7 +94,7 @@ def populatePlugins():
         if f.endswith('.py') and not '__init__' in f and not f.startswith('_'):
             loadPlugin(f[:-3])
 
-# TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
+# @TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
 def cd(args):
     global current_directory
     with directory(current_directory):
@@ -109,22 +109,6 @@ def history(args):
     print('history')
 
 
-def loadTheme(name):
-    try:
-        theme = __import__('themes.{}'.format(name), fromlist=['themes'])
-    except ImportError:
-        return None
-    themes[name] = theme
-    return theme
-
-def populateThemes():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    for f in os.listdir('themes'):
-        if f.endswith('.py') and not '__init__' in f and not f.startswith('_'):
-            loadTheme(f[:-3])
-
-
-
 # A dictionary of commands in this file
 builtins = {
     'cd': cd,
@@ -135,7 +119,7 @@ builtins = {
 
 def runCommand(command, args):
 
-    #TODO: Handle aliases? (preprocessing of input)
+    # @TODO: Handle aliases? (preprocessing of input)
 
     # First, determine if the command is built-in
     if command in builtins:
@@ -153,7 +137,7 @@ def runCommand(command, args):
         return
 
     # Attempt to pass the command off to the underlying OS
-    # TODO: Error checking! (does command exist?)
+    # @TODO: Error checking! (does command exist?)
     with directory(current_directory):
         subprocess.call([command] + args)
 
@@ -162,7 +146,7 @@ def runCommand(command, args):
 
 
 
-    #TODO:
+    # @TODO:
     # 2. Attempt to pass the command off to the underlying shell. If that succeeds, return.
     # 3. Interpret command semantically. This could include conversationally, etc.
 
@@ -300,10 +284,10 @@ class Shell(wx.Frame):
         print("Received hot key")
 
     def RefreshTheme(self):
-        self.SetBackgroundColour(current_theme.app)
-        self.outtc.SetBackgroundColour(current_theme.out_bg)
-        self.intc.SetBackgroundColour(current_theme.in_bg)
-        self.intc.SetForegroundColour(current_theme.in_fg)
+        self.SetBackgroundColour(JARVIS.thememanager.current_theme.app)
+        self.outtc.SetBackgroundColour(JARVIS.thememanager.current_theme.out_bg)
+        self.intc.SetBackgroundColour(JARVIS.thememanager.current_theme.in_bg)
+        self.intc.SetForegroundColour(JARVIS.thememanager.current_theme.in_fg)
         self.Refresh()
 
 
@@ -369,7 +353,7 @@ class Shell(wx.Frame):
 
         # Technically there could be a case where an empty string SHOULD be printed...not sure when though
         if message:
-            out.BeginTextColour(current_theme.out_fg)
+            out.BeginTextColour(JARVIS.thememanager.current_theme.out_fg)
             out.WriteText(message)
             out.EndTextColour()
 
@@ -377,10 +361,10 @@ class Shell(wx.Frame):
         out.ShowPosition(out.GetLastPosition())
 
     def JarvisMessage(self, message):
-        self.WriteMessage(self.outtc, 'Jarvis > ', current_theme.jarvis_msg, message + '\n')
+        self.WriteMessage(self.outtc, 'Jarvis > ', JARVIS.thememanager.current_theme.jarvis_msg, message + '\n')
 
     def UserMessage(self, message):
-        self.WriteMessage(self.outtc, '{} > '.format(socket.gethostname()), current_theme.user_msg, message + '\n')
+        self.WriteMessage(self.outtc, '{} > '.format(socket.gethostname()), JARVIS.thememanager.current_theme.user_msg, message + '\n')
 
 
 
@@ -391,15 +375,15 @@ class Shell(wx.Frame):
         if key == wx.WXK_RETURN:
             self.UserEnter(event)
 
-        #TODO: Tab Completion
+        # @TODO: Tab Completion
         elif key == wx.WXK_TAB:
             pass
 
-        #TODO: Cycle through previous command history
+        # @TODO: Cycle through previous command history
         elif key in [wx.WXK_UP, wx.WXK_NUMPAD_UP]:
             pass
 
-        #TODO: Cycle towards most recent commands in history
+        # @TODO: Cycle towards most recent commands in history
         elif key in [wx.WXK_DOWN, wx.WXK_NUMPAD_DOWN]:
             pass
 
@@ -430,7 +414,7 @@ class Shell(wx.Frame):
                 runCommand(raw_cmd[0], raw_cmd[1:])
 
     def StdOutEnter(self, event):
-        self.WriteMessage(self.outtc, '', current_theme.out_fg, event.text)
+        self.WriteMessage(self.outtc, '', JARVIS.thememanager.current_theme.out_fg, event.text)
 
 
     def OnClose(self, event):
@@ -443,6 +427,8 @@ class Shell(wx.Frame):
 
 
 class SysOutListener:
+    """Handles redirecting stdout to our application GUI"""
+
     def write(self, string):
         sys.__stdout__.write(string)
         evt = wxStdOut(text=string)
@@ -457,20 +443,17 @@ class JarvisApp(wx.App):
         return True
 
 
+class Jarvis:
+    def __init__(self):
+        populatePlugins()  # Find all plugins we know about
+        self.thememanager = ThemeManager()
+
+    def run_app(self):
+        self.app = JarvisApp(redirect=False)
+        sys.stdout = SysOutListener()
+        self.app.MainLoop()
+
+
 if __name__ == '__main__':
-
-    # Find all plugins we know about
-    populatePlugins()
-
-    # Find all themes we know about
-    populateThemes()
-
-    #TODO: Theme manager (separate)
-    current_theme = themes['default']
-
-    app = JarvisApp(redirect=False) # We do not want to redirect our stdout/stderr to the console
-    
-    # Redirect stdout to our window
-    sys.stdout = SysOutListener()
-
-    app.MainLoop()
+    JARVIS = Jarvis()
+    JARVIS.run_app()
