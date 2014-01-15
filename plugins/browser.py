@@ -1,4 +1,4 @@
 import webbrowser
 
 def run(args):
-	webbrowser.open('http://www.google.com')
+    webbrowser.open('http://www.google.com')

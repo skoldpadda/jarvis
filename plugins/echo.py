@@ -1,2 +1,2 @@
 def run(args):
-	print ' '.join(args)
+    print ' '.join(args)
