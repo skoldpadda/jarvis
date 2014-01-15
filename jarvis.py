@@ -138,8 +138,12 @@ def runCommand(command, args):
 
     # Attempt to pass the command off to the underlying OS
     # @TODO: Error checking! (does command exist?)
-    with directory(current_directory):
-        subprocess.call([command] + args)
+    try:
+        with directory(current_directory):
+            subprocess.call([command] + args)
+        return
+    except WindowsError:
+        pass
 
     # Okay...we really don't know what to do
     print('Unrecognized command "{}"'.format(command))
@@ -284,10 +288,10 @@ class Shell(wx.Frame):
         print("Received hot key")
 
     def RefreshTheme(self):
-        self.SetBackgroundColour(JARVIS.thememanager.current_theme.app)
-        self.outtc.SetBackgroundColour(JARVIS.thememanager.current_theme.out_bg)
-        self.intc.SetBackgroundColour(JARVIS.thememanager.current_theme.in_bg)
-        self.intc.SetForegroundColour(JARVIS.thememanager.current_theme.in_fg)
+        self.SetBackgroundColour(JARVIS.theme_manager.current_theme.app)
+        self.outtc.SetBackgroundColour(JARVIS.theme_manager.current_theme.out_bg)
+        self.intc.SetBackgroundColour(JARVIS.theme_manager.current_theme.in_bg)
+        self.intc.SetForegroundColour(JARVIS.theme_manager.current_theme.in_fg)
         self.Refresh()
 
 
@@ -353,7 +357,7 @@ class Shell(wx.Frame):
 
         # Technically there could be a case where an empty string SHOULD be printed...not sure when though
         if message:
-            out.BeginTextColour(JARVIS.thememanager.current_theme.out_fg)
+            out.BeginTextColour(JARVIS.theme_manager.current_theme.out_fg)
             out.WriteText(message)
             out.EndTextColour()
 
@@ -361,10 +365,10 @@ class Shell(wx.Frame):
         out.ShowPosition(out.GetLastPosition())
 
     def JarvisMessage(self, message):
-        self.WriteMessage(self.outtc, 'Jarvis > ', JARVIS.thememanager.current_theme.jarvis_msg, message + '\n')
+        self.WriteMessage(self.outtc, 'Jarvis > ', JARVIS.theme_manager.current_theme.jarvis_msg, message + '\n')
 
     def UserMessage(self, message):
-        self.WriteMessage(self.outtc, '{} > '.format(socket.gethostname()), JARVIS.thememanager.current_theme.user_msg, message + '\n')
+        self.WriteMessage(self.outtc, '{} > '.format(socket.gethostname()), JARVIS.theme_manager.current_theme.user_msg, message + '\n')
 
 
 
@@ -398,15 +402,13 @@ class Shell(wx.Frame):
 
 
     def UserEnter(self, event):
-        #global theme
-        #theme = default
-        #self.RefreshTheme()
-
         uin = self.intc.GetValue()
         self.intc.SetValue('')
 
         self.UserMessage(uin)
         if uin:
+            # @TODO: This should not happen here. If for example the user types "i'm doing fine" (note the quote)
+            # shlex will throw a ValueError
             raw_cmd = shlex.split(uin)
             if raw_cmd[0] in ['exit', 'quit', 'bye']:
                 self.Close()
@@ -414,7 +416,7 @@ class Shell(wx.Frame):
                 runCommand(raw_cmd[0], raw_cmd[1:])
 
     def StdOutEnter(self, event):
-        self.WriteMessage(self.outtc, '', JARVIS.thememanager.current_theme.out_fg, event.text)
+        self.WriteMessage(self.outtc, '', JARVIS.theme_manager.current_theme.out_fg, event.text)
 
 
     def OnClose(self, event):
@@ -446,7 +448,7 @@ class JarvisApp(wx.App):
 class Jarvis:
     def __init__(self):
         populatePlugins()  # Find all plugins we know about
-        self.thememanager = ThemeManager()
+        self.theme_manager = ThemeManager()
 
     def run_app(self):
         self.app = JarvisApp(redirect=False)
