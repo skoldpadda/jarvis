@@ -1,0 +1,93 @@
+html {
+    background-color: #f5f5f5;
+}
+
+body {
+    color: #151515;
+    font-family: "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    min-width: 360px;
+}
+
+div#torso, footer section {
+    margin: 0 auto 0 auto;
+    padding: 10px;
+}
+
+div#torso {
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 68px;
+}
+
+footer {
+    height: 68px;
+    background-color: #e0e0e0;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    min-width: 360px;
+
+    box-shadow: 0 0 10px 2px #505050;
+    -moz-box-shadow: 0 0 10px 2px #505050;
+    -o-box-shadow: 0 0 10px 2px #505050;
+    -webkit-box-shadow: 0 0 10px 2px #505050;
+}
+
+footer section {
+    overflow: hidden;
+}
+
+#ctrlpanel {
+    opacity: 0.2;
+    margin-right: 5px;
+    transition: opacity .25s ease-in-out;
+    -webkit-transition: opacity .25s ease-in-out;
+    -moz-transition: opacity .25s ease-in-out;
+}
+
+#ctrlpanel:hover {
+    opacity: 1.0;
+}
+
+span.jarvis {
+    color: #d28445;
+    font-weight: bold;
+}
+
+span.user {
+    color: #6a9fb5;
+    font-weight: bold;
+}
+
+
+input#search {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    color: #151515;
+    font-family: 'Consolas', monospace;
+    font-size: 28px;
+    outline: 0;
+    padding: 5px;
+    width: 100%;
+    transition: box-shadow .25s ease-in-out, border-color .25s ease-in-out;
+    -webkit-transition: -webkit-box-shadow .25s ease-in-out, border-color .25s ease-in-out;
+    -moz-transition: -moz-box-shadow .25s ease-in-out, border-color .25s ease-in-out;
+}
+
+input#search:focus {
+    -moz-box-shadow: 0 0 5px 0 #6a9fb5;
+    -o-box-shadow: 0 0 5px 0 #6a9fb5;
+    -webkit-box-shadow: 0 0 5px 0 #6a9fb5;
+    box-shadow: 0 0 5px 0 #6a9fb5;
+    border-color: #6a9fb5;
+}
