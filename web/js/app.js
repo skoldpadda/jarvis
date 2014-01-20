@@ -1,5 +1,6 @@
 function linkBridge() {
     bridge.to_client.connect(fromKernel);
+    $('#search').focus();
 }
 
 function fromKernel(message) {
@@ -16,5 +17,10 @@ $(function() {
             bridge.from_client($('#search').val());
             $('#search').val('');
         }
+    });
+
+    $('#ctrlpanel').click(function() {
+        // Control Panel button was clicked, notify Python to spawn window
+        return false;
     });
 });
