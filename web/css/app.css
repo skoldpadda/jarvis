@@ -18,7 +18,7 @@ div#torso, footer section {
 }
 
 div#torso {
-    overflow: hidden;
+    /*overflow: hidden;*/
     position: relative;
     margin-bottom: 68px;
 }

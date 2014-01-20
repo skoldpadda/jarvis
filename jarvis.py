@@ -162,7 +162,7 @@ class Shell(QWebView):
 
     def initUI(self):
         self.resize(720, 420)
-        self.setMinimumSize(360, 210)
+        self.setMinimumSize(380, 240)
         self.center()
         self.setWindowTitle('Jarvis - {}'.format(current_directory))
         self.setWindowIcon(self.JarvisIcon)

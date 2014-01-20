@@ -4,7 +4,9 @@ function linkBridge() {
 
 function fromKernel(message) {
     var data = JSON.parse(message);
-    $('#content').append("<span class=\"" + data.author + "\">" + data.tag + "</span> " + data.message);
+    var content = $('#content');
+    content.append("<span class=\"" + data.author + "\">" + data.tag + "</span> " + data.message);
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
 $(function() {
