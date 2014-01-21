@@ -7,14 +7,10 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
 
 ...Still want to run it? Okay. You will need the latest [PySide](http://qt-project.org/wiki/Get-PySide) installed. Then just do `python jarvis.py`.
 
-Goals
------
+Spec
+----
 
-> It is not our duty to understand the arbitrary, meaningless dictates of machines.
-
-> -- Don Norman, *The Design of Everyday Things*
-
-**Note**: This section is a work-in-progress.
+For more about the project's goals and design, see the [spec](spec.md).
 
 Todo
 ----
