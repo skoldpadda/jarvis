@@ -1,0 +1,16 @@
+MINIMIZE, MAXIMIZE, RESTORE
+---------------------------
+			BACK		FORE
+DEFAULT		black 0%	black 20%
+HOVER		black 8%	black 100%
+CLICK		blue 100%	toolbar 100%
+
+CLOSE
+--------
+			BACK		FORE
+DEFAULT		black 0%	black 20%
+HOVER		red 100%	toolbar 100%
+CLICK		black 100%	toolbar 100%
+
+
+The base icon information encodes FORE as black and BACK as white. It is then manipulated on theme change (including startup) using canvas to generate the default/hover/click states.

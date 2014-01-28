@@ -1,0 +1,16 @@
+{
+  "name": "Jarvis",
+  "main": "index.html",
+  "window": {
+  	"title": "Jarvis",
+  	"icon": "media/jarvis-icon.png",
+    "show": false,
+    "toolbar": false,
+    "frame": false,
+    "position": "center",
+    "width": 720,
+    "height": 420,
+    "min_width": 380,
+    "min_height": 240
+  }
+}

@@ -1,0 +1,173 @@
+/**
+ * Much thanks to Steven Sanderson for the basic layout!
+ * http://blog.stevensanderson.com/2011/10/05/full-height-app-layouts-a-css-trick-to-make-it-easier/
+ */
+
+
+html {
+    background-color: #ffffff;
+}
+
+body {
+    color: #4d4d4c;
+    font-family: "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    min-width: 360px;
+}
+
+
+/** Scrollbar **/
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background-color: #efefef;
+    border-left: 1px solid #c5c8c6;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #c5c8c6;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #b4b7b4;
+}
+
+
+
+/** Generic Layout Rules **/
+
+.row {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.scroll-y {
+    overflow-y: auto;
+}
+
+.titlebar.row {
+    height: 32px;
+}
+
+.body.row {
+    top: 32px;
+    bottom: 68px;
+}
+
+.footer.row {
+    height: 68px;
+    bottom: 0;
+}
+
+
+/** Generic Styles **/
+
+.bar {
+    background-color: #efefef;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    box-shadow: 0 0 10px 2px #8e908c;
+}
+
+.btn {
+    -webkit-app-region: no-drag;
+}
+
+
+
+/** Titlebar **/
+
+.titlebar {
+    z-index: 100;
+}
+
+.titlebar-text {
+    position: absolute;
+    left: 10px;
+    width: 80%;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+#minimize, #maximize, #close, #restore {
+    position: absolute;
+    width: 30px;
+    height: 26px;
+}
+
+#minimize {
+    right: 60px;
+}
+
+#maximize, #restore {
+    right: 30px;
+}
+
+#close {
+    right: 0px;
+}
+
+#restore {
+    visibility: hidden;
+}
+
+#ctrlpanel {
+    width: 48px;
+    height: 48px;
+    margin-right: 5px;
+}
+
+
+/** Body **/
+
+.body, .footer section {
+    margin: 0 auto 0 auto;
+    padding: 10px;
+}
+
+
+/** Footer **/
+
+.footer section {
+    overflow: hidden;
+}
+
+
+input#search {
+    box-sizing: border-box;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: 1px solid #efefef;
+    color: #4d4d4c;
+    font-family: 'Consolas', monospace;
+    font-size: 28px;
+    outline: 0;
+    padding: 5px;
+    width: 100%;
+    transition: box-shadow .25s ease-in-out, border-color .25s ease-in-out;
+    -webkit-transition: -webkit-box-shadow .25s ease-in-out, border-color .25s ease-in-out;
+    -webkit-app-region: no-drag;
+}
+
+input#search:focus {
+    box-shadow: 0 0 5px 0 #3e999f;
+    border-color: #3e999f;
+}
+
+
+/** Message Styles **/
+
+span.jarvis {
+    color: #f5871f;
+    font-weight: bold;
+}
+
+span.user {
+    color: #4271ae;
+    font-weight: bold;
+}

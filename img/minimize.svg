@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="26">
+    <g>
+        <title>Minimize</title>
+        <path class="bg" fill="#c8c8c8" d="M0 0h30v26h-30z"/>
+        <path class="fg" d="M11 16h8v2h-8z"/>
+        <path class="click" fill-opacity="0.0" d="M0 0h30v26h-30z"/>
+    </g>
+</svg>

@@ -1,0 +1,225 @@
+var gui = require('nw.gui'), win = gui.Window.get();
+var os = require('os');
+
+// @TODO: Okay so why is the moment.js node package 3 freaking MB? MUST find a way to crunch dependencies.
+// Although, because JS support for date formatting sucks...kinda need this
+var moment = require('moment');
+
+
+/** BUTTONS **/
+
+function styleIcon(icon, name, theme) {
+    var bg = icon.getElementsByClassName("bg")[0];
+    bg.setAttribute("fill", theme.bg.color);
+    bg.setAttribute("fill-opacity", theme.bg.opacity);
+
+    var fg = icon.getElementsByClassName("fg")[0];
+    fg.setAttribute("fill", theme.fg.color);
+    fg.setAttribute("fill-opacity", theme.fg.opacity);
+}
+
+function createButton(name, theme, func) {
+    var svgobj = document.getElementById(name),
+        svg = svgobj.contentDocument,
+        svgclick = svg.getElementsByClassName("click")[0];
+    
+
+    styleIcon(svg, name, theme.default);
+
+    svgclick.onmouseover = function() {
+        styleIcon(svg, name, theme.hover);
+    };
+
+    svgclick.onmouseout = function() {
+        styleIcon(svg, name, theme.default);
+    };
+
+    svgclick.onmousedown = function() {
+        styleIcon(svg, name, theme.click);
+    };
+
+    svgclick.onmouseup = function() {
+        styleIcon(svg, name, theme.hover);
+    };
+
+    svgclick.onclick = function() {
+        func();
+    };
+}
+
+function minimize() {
+    win.minimize();
+}
+
+function maximize() {
+    win.maximize();
+}
+
+function restore() {
+    win.unmaximize();
+}
+
+function close() {
+    win.close();
+}
+
+function ctrlpanel() {
+    // @TODO: This is convenient, but really we need our own control panel
+    win.showDevTools();
+}
+
+
+function refreshTheme(theme) {
+
+
+/*
+DEFAULT:
+
+FROM https://github.com/chriskempson/tomorrow-theme/blob/master/Brackets/brackets_theme_tomorrow.less
+Note that the tomorrow theme in base16 is modified and not as good
+
+@background: #ffffff;
+@current-line: #efefef;
+@foreground: #4d4d4c;
+@comment: #8e908c;
+@red: #c82829;
+@orange: #f5871f;
+@yellow: #eab700;
+@green: #718c00;
+@aqua: #3e999f;
+@blue: #4271ae;
+@purple: #8959a8;
+
+
+*/
+    
+    var foreground = "#4d4d4c";
+    var blue = "#4271ae";
+    var red = "#c82829";
+    var titlebar = "#efefef";
+
+
+    var but1 = {
+        "default": {
+            "bg": {"color": foreground, "opacity": "0.0"},
+            "fg": {"color": foreground, "opacity": "0.2"}
+        },
+        "hover": {
+            "bg": {"color": foreground, "opacity": "0.08"},
+            "fg": {"color": foreground, "opacity": "1.0"}
+        },
+        "click": {
+            "bg": {"color": blue, "opacity": "1.0"},
+            "fg": {"color": titlebar, "opacity": "1.0"}
+        }
+    };
+
+
+    var but2 = {
+        "default": {
+            "bg": {"color": foreground, "opacity": "0.0"},
+            "fg": {"color": foreground, "opacity": "0.2"}
+        },
+        "hover": {
+            "bg": {"color": red, "opacity": "1.0"},
+            "fg": {"color": titlebar, "opacity": "1.0"}
+        },
+        "click": {
+            "bg": {"color": foreground, "opacity": "1.0"},
+            "fg": {"color": titlebar, "opacity": "1.0"}
+        }
+    };
+
+    var but3 = {
+        "default": {
+            "bg": {"color": foreground, "opacity": "0.0"},
+            "fg": {"color": foreground, "opacity": "0.2"}
+        },
+        "hover": {
+            "bg": {"color": foreground, "opacity": "0.0"},
+            "fg": {"color": foreground, "opacity": "1.0"}
+        },
+        "click": {
+            "bg": {"color": foreground, "opacity": "0.0"},
+            "fg": {"color": blue, "opacity": "1.0"}
+        }
+    };
+
+    createButton("minimize", but1, minimize);
+    createButton("maximize", but1, maximize);
+    createButton("restore", but1, restore);
+    createButton("close", but2, close);
+    createButton("ctrlpanel", but3, ctrlpanel);
+}
+
+
+function printMessage(message) {
+    var content = document.getElementById("content");
+    content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + "</span> " + message.text.replace('\n', '<br>').replace(' ', '&nbsp;');
+    content.parentNode.scrollTop = content.parentNode.scrollHeight;
+}
+
+function jarvisMessage(message) {
+    printMessage({"author": "jarvis", "tag": "Jarvis > ", "text": message + "\n"});
+}
+
+function userMessage(message) {
+    printMessage({"author": "user", "tag": os.hostname() + " > ", "text": message + "\n"});
+}
+
+
+function getUserHome() {
+    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+}
+
+function resetTitlebarText() {
+    document.getElementsByClassName("titlebar-text")[0].innerHTML = "Jarvis - " + getUserHome();
+}
+
+function onSearchKeypress(e) {
+    if (typeof e == 'undefined' && window.event) {
+        e = window.event;
+    }
+    // Enter pressed?
+    if (e.keyCode == 10 || e.keyCode == 13) {
+        user_input = document.getElementById("search").value;
+        document.getElementById("search").value = "";
+        userMessage(user_input);
+    }
+}
+
+
+window.onload = function() {
+    refreshTheme();
+
+    document.getElementById("search").onkeypress = function(e) {
+        onSearchKeypress(e);
+    };
+
+    resetTitlebarText();
+
+    win.show();
+
+    document.getElementById("search").focus();
+    jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+}
+
+
+
+/** WINDOW EVENTS **/
+
+win.on('close', function() {
+    this.hide(); // Pretend to be closed already
+    // Do things that need cleaning up
+    this.close(true);
+});
+
+win.on('maximize', function() {
+    document.getElementById("maximize").style.visibility = "hidden";
+    document.getElementById("restore").style.visibility = "visible";
+});
+
+win.on('unmaximize', function() {
+    document.getElementById("restore").style.visibility = "hidden";
+    document.getElementById("maximize").style.visibility = "visible";
+});

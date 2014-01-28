@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="26">
+    <g>
+        <title>Maximize</title>
+        <path class="bg" fill="#c8c8c8" d="M0 0h30v26h-30z"/>
+        <path class="fg" d="M10 8v10h10v-10h-10zm1 3h8v6h-8v-6z"/>
+        <path class="click" fill-opacity="0.0" d="M0 0h30v26h-30z"/>
+    </g>
+</svg>
