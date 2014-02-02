@@ -138,7 +138,7 @@ body {
 }
 
 
-input#search {
+input#inputbar {
     box-sizing: border-box;
     border-radius: 4px;
     background-color: #ffffff;
@@ -154,7 +154,7 @@ input#search {
     -webkit-app-region: no-drag;
 }
 
-input#search:focus {
+input#inputbar:focus {
     box-shadow: 0 0 5px 0 #3e999f;
     border-color: #3e999f;
 }

@@ -4,6 +4,10 @@ var os = require('os');
 // External libraries
 var moment = require('./js/lib/moment.js');
 
+// Our kernel
+var Kernel = require('./js/kernel.js');
+var myKernel = new Kernel();
+
 
 /** BUTTONS **/
 
@@ -119,7 +123,10 @@ Note that the tomorrow theme in base16 is modified and not as good
 
 function printMessage(message) {
     var content = document.getElementById("content");
-    content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + "</span> " + message.text.replace('\n', '<br>').replace(' ', '&nbsp;');
+    if (message.hasOwnProperty('tag')) {
+        content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + "</span> ";
+    }
+    content.innerHTML += message.text.replace('\n', '<br>').replace(' ', '&nbsp;');
     content.parentNode.scrollTop = content.parentNode.scrollHeight;
 }
 
@@ -136,35 +143,39 @@ function getUserHome() {
     return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
 
-function resetTitlebarText() {
-    document.getElementsByClassName("titlebar-text")[0].innerHTML = "Jarvis - " + getUserHome();
+function resetTitlebarText(text) {
+    document.getElementsByClassName("titlebar-text")[0].innerHTML = "Jarvis - " + text;
 }
 
-function onSearchKeypress(e) {
+function onInputBarKeypress(e) {
     if (typeof e == 'undefined' && window.event) {
         e = window.event;
     }
     // Enter pressed?
     if (e.keyCode == 10 || e.keyCode == 13) {
-        user_input = document.getElementById("search").value;
-        document.getElementById("search").value = "";
-        userMessage(user_input);
+        user_input = document.getElementById("inputbar").value;
+        document.getElementById("inputbar").value = "";
+        myKernel.userInput(user_input);
     }
 }
+
+myKernel.on('user_input_acknowledged', function(input) {
+    userMessage(input);
+});
 
 
 window.onload = function() {
     refreshTheme();
 
-    document.getElementById("search").onkeypress = function(e) {
-        onSearchKeypress(e);
+    document.getElementById("inputbar").onkeypress = function(e) {
+        onInputBarKeypress(e);
     };
 
-    resetTitlebarText();
+    resetTitlebarText(getUserHome());
 
     win.show();
 
-    document.getElementById("search").focus();
+    document.getElementById("inputbar").focus();
     jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
 }
 
