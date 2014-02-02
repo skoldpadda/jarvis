@@ -1,2 +1,4 @@
 DEPRECATED/
 *.py[cod]
+run.bat
+run.sh

@@ -1,14 +1,13 @@
 var gui = require('nw.gui'), win = gui.Window.get();
 var os = require('os');
 
-// @TODO: Okay so why is the moment.js node package 3 freaking MB? MUST find a way to crunch dependencies.
-// Although, because JS support for date formatting sucks...kinda need this
-var moment = require('moment');
+// External libraries
+var moment = require('./js/lib/moment.js');
 
 
 /** BUTTONS **/
 
-function styleIcon(icon, name, theme) {
+function styleIcon(icon, theme) {
     var bg = icon.getElementsByClassName("bg")[0];
     bg.setAttribute("fill", theme.bg.color);
     bg.setAttribute("fill-opacity", theme.bg.opacity);
@@ -22,26 +21,21 @@ function createButton(name, theme, func) {
     var svgobj = document.getElementById(name),
         svg = svgobj.contentDocument,
         svgclick = svg.getElementsByClassName("click")[0];
-    
 
-    styleIcon(svg, name, theme.default);
+    styleIcon(svg, theme.up);
 
     svgclick.onmouseover = function() {
-        styleIcon(svg, name, theme.hover);
+        styleIcon(svg, theme.over);
     };
-
     svgclick.onmouseout = function() {
-        styleIcon(svg, name, theme.default);
+        styleIcon(svg, theme.up);
     };
-
     svgclick.onmousedown = function() {
-        styleIcon(svg, name, theme.click);
+        styleIcon(svg, theme.down);
     };
-
     svgclick.onmouseup = function() {
-        styleIcon(svg, name, theme.hover);
+        styleIcon(svg, theme.over);
     };
-
     svgclick.onclick = function() {
         func();
     };
@@ -100,49 +94,19 @@ Note that the tomorrow theme in base16 is modified and not as good
 
 
     var but1 = {
-        "default": {
-            "bg": {"color": foreground, "opacity": "0.0"},
-            "fg": {"color": foreground, "opacity": "0.2"}
-        },
-        "hover": {
-            "bg": {"color": foreground, "opacity": "0.08"},
-            "fg": {"color": foreground, "opacity": "1.0"}
-        },
-        "click": {
-            "bg": {"color": blue, "opacity": "1.0"},
-            "fg": {"color": titlebar, "opacity": "1.0"}
-        }
+        "up": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": foreground, "opacity": "0.2"}},
+        "over": {"bg": {"color": foreground, "opacity": "0.08"}, "fg": {"color": foreground, "opacity": "1.0"}},
+        "down": {"bg": {"color": blue, "opacity": "1.0"}, "fg": {"color": titlebar, "opacity": "1.0"}}
     };
-
-
     var but2 = {
-        "default": {
-            "bg": {"color": foreground, "opacity": "0.0"},
-            "fg": {"color": foreground, "opacity": "0.2"}
-        },
-        "hover": {
-            "bg": {"color": red, "opacity": "1.0"},
-            "fg": {"color": titlebar, "opacity": "1.0"}
-        },
-        "click": {
-            "bg": {"color": foreground, "opacity": "1.0"},
-            "fg": {"color": titlebar, "opacity": "1.0"}
-        }
+        "up": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": foreground, "opacity": "0.2"}},
+        "over": {"bg": {"color": red, "opacity": "1.0"}, "fg": {"color": titlebar, "opacity": "1.0"}},
+        "down": {"bg": {"color": foreground, "opacity": "1.0"}, "fg": {"color": titlebar, "opacity": "1.0"}}
     };
-
     var but3 = {
-        "default": {
-            "bg": {"color": foreground, "opacity": "0.0"},
-            "fg": {"color": foreground, "opacity": "0.2"}
-        },
-        "hover": {
-            "bg": {"color": foreground, "opacity": "0.0"},
-            "fg": {"color": foreground, "opacity": "1.0"}
-        },
-        "click": {
-            "bg": {"color": foreground, "opacity": "0.0"},
-            "fg": {"color": blue, "opacity": "1.0"}
-        }
+        "up": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": foreground, "opacity": "0.2"}},
+        "over": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": foreground, "opacity": "1.0"}},
+        "down": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": blue, "opacity": "1.0"}}
     };
 
     createButton("minimize", but1, minimize);
@@ -209,7 +173,7 @@ window.onload = function() {
 /** WINDOW EVENTS **/
 
 win.on('close', function() {
-    this.hide(); // Pretend to be closed already
+    this.hide();  // Pretend to be closed already
     // Do things that need cleaning up
     this.close(true);
 });

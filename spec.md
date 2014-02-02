@@ -29,4 +29,4 @@ I want a shell that understands. I want a shell that asks me, "Why are you tryin
 Communication Policy
 --------------------
 
-All communication between the client (JavaScript frontend/UI) and kernel (Python backend) shall be in **JSON**. This is because both languages are equipped to easily handle JSON.
+@TODO
