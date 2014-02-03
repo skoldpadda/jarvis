@@ -130,6 +130,10 @@ body {
     padding: 10px;
 }
 
+#content {
+    white-space: pre-wrap;
+}
+
 
 /** Footer **/
 

@@ -120,13 +120,12 @@ Note that the tomorrow theme in base16 is modified and not as good
     createButton("ctrlpanel", but3, ctrlpanel);
 }
 
-
 function printMessage(message) {
     var content = document.getElementById("content");
     if (message.hasOwnProperty('tag')) {
-        content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + "</span> ";
+        content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + "</span>";
     }
-    content.innerHTML += message.text.replace('\n', '<br>').replace(' ', '&nbsp;');
+    content.innerHTML += message.text;
     content.parentNode.scrollTop = content.parentNode.scrollHeight;
 }
 
@@ -161,6 +160,14 @@ function onInputBarKeypress(e) {
 
 myKernel.on('user_input_acknowledged', function(input) {
     userMessage(input);
+});
+
+myKernel.on('kernel_out', function(data) {
+    printMessage({"text": data + "\n"});
+});
+
+myKernel.on('kernel_err', function(data) {
+    printMessage({"text": "<span style=\"color:#c82829;\">" + data + "</span>\n"});
 });
 
 
