@@ -1,8 +1,6 @@
-Design Specification
-====================
+# Design Specification
 
-Goals
------
+## Goals
 
 **Note**: This section is a work-in-progress.
 
@@ -26,7 +24,6 @@ I want a shell that understands. I want a shell that asks me, "Why are you tryin
 
   For all its shortcomings, bash has stood the test of time because it does what it does remarkably well. jarvis is not intended to be its replacement, but rather a supplement focusing on the above goals. As such, things like full-screen buffers (e.g. vi, emacs) and bash scripting will not be supported.
 
-Communication Policy
---------------------
+## Communication Policy
 
 @TODO

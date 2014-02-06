@@ -5,7 +5,7 @@ var os = require('os');
 var moment = require('./js/lib/moment.js');
 
 // Our kernel
-var Kernel = require('./js/kernel.js');
+var Kernel = require('./js/kernel/kernel.js');
 var myKernel = new Kernel();
 
 

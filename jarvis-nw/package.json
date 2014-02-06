@@ -3,7 +3,7 @@
   "main": "index.html",
   "window": {
   	"title": "Jarvis",
-  	"icon": "media/jarvis-icon.png",
+  	"icon": "img/jarvis-icon.png",
     "show": false,
     "toolbar": false,
     "frame": false,
