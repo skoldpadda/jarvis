@@ -8,6 +8,11 @@ var moment = require('./js/lib/moment.js');
 var Kernel = require('./js/kernel/kernel.js');
 var myKernel = new Kernel();
 
+// User settings
+var settings = require('../user/settings.js');
+
+var theme_manager = require('./js/client/theme.js');
+
 
 /** BUTTONS **/
 
@@ -67,35 +72,13 @@ function ctrlpanel() {
 }
 
 
-function refreshTheme(theme) {
+function refreshTheme(name) {
+    theme_manager.loadTheme(name);
 
-
-/*
-DEFAULT:
-
-FROM https://github.com/chriskempson/tomorrow-theme/blob/master/Brackets/brackets_theme_tomorrow.less
-Note that the tomorrow theme in base16 is modified and not as good
-
-@background: #ffffff;
-@current-line: #efefef;
-@foreground: #4d4d4c;
-@comment: #8e908c;
-@red: #c82829;
-@orange: #f5871f;
-@yellow: #eab700;
-@green: #718c00;
-@aqua: #3e999f;
-@blue: #4271ae;
-@purple: #8959a8;
-
-
-*/
-    
-    var foreground = "#4d4d4c";
-    var blue = "#4271ae";
-    var red = "#c82829";
-    var titlebar = "#efefef";
-
+    var foreground = theme_manager.color('foreground');
+    var blue = theme_manager.color('blue');
+    var red = theme_manager.color('red');
+    var titlebar = theme_manager.color('titlebar');
 
     var but1 = {
         "up": {"bg": {"color": foreground, "opacity": "0.0"}, "fg": {"color": foreground, "opacity": "0.2"}},
@@ -118,6 +101,10 @@ Note that the tomorrow theme in base16 is modified and not as good
     createButton("restore", but1, restore);
     createButton("close", but2, close);
     createButton("ctrlpanel", but3, ctrlpanel);
+
+    // Now we reset CSS
+    theme_manager.resetCSS(document);
+
 }
 
 function printMessage(message) {
@@ -167,12 +154,12 @@ myKernel.on('kernel_out', function(data) {
 });
 
 myKernel.on('kernel_err', function(data) {
-    printMessage({"text": "<span style=\"color:#c82829;\">" + data + "</span>\n"});
+    printMessage({"text": "<span style=\"color:" + theme_manager.color('red') + ";\">" + data + "</span>\n"});
 });
 
 
 window.onload = function() {
-    refreshTheme();
+    refreshTheme(settings.theme);
 
     document.getElementById("inputbar").onkeypress = function(e) {
         onInputBarKeypress(e);

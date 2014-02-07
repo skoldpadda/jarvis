@@ -1,15 +1,12 @@
 /**
  * Much thanks to Steven Sanderson for the basic layout!
  * http://blog.stevensanderson.com/2011/10/05/full-height-app-layouts-a-css-trick-to-make-it-easier/
+ *
+ * Colors and shadows are set dynamically in theme.js. An old version with full colors can be found at:
+ * https://github.com/willyg302/jarvis/blob/0e46c26c6dc3d944531698dabc6d28fd83e0d5ab/jarvis-nw/css/app.css
  */
 
-
-html {
-    background-color: #ffffff;
-}
-
 body {
-    color: #4d4d4c;
     font-family: "Consolas", monospace;
     font-size: 14px;
     line-height: 1.5;
@@ -24,17 +21,6 @@ body {
 ::-webkit-scrollbar {
     width: 12px;
 }
-::-webkit-scrollbar-track {
-    background-color: #efefef;
-    border-left: 1px solid #c5c8c6;
-}
-::-webkit-scrollbar-thumb {
-    background-color: #c5c8c6;
-}
-::-webkit-scrollbar-thumb:hover {
-    background-color: #b4b7b4;
-}
-
 
 
 /** Generic Layout Rules **/
@@ -68,16 +54,13 @@ body {
 /** Generic Styles **/
 
 .bar {
-    background-color: #efefef;
     -webkit-user-select: none;
     -webkit-app-region: drag;
-    box-shadow: 0 0 10px 2px #8e908c;
 }
 
 .btn {
     -webkit-app-region: no-drag;
 }
-
 
 
 /** Titlebar **/
@@ -141,13 +124,9 @@ body {
     overflow: hidden;
 }
 
-
 input#inputbar {
     box-sizing: border-box;
     border-radius: 4px;
-    background-color: #ffffff;
-    border: 1px solid #efefef;
-    color: #4d4d4c;
     font-family: 'Consolas', monospace;
     font-size: 28px;
     outline: 0;
@@ -158,20 +137,13 @@ input#inputbar {
     -webkit-app-region: no-drag;
 }
 
-input#inputbar:focus {
-    box-shadow: 0 0 5px 0 #3e999f;
-    border-color: #3e999f;
-}
-
 
 /** Message Styles **/
 
 span.jarvis {
-    color: #f5871f;
     font-weight: bold;
 }
 
 span.user {
-    color: #4271ae;
     font-weight: bold;
 }
