@@ -1,9 +1,9 @@
 {
-  "name": "Jarvis",
+  "name": "jarvis",
   "main": "index.html",
   "window": {
-  	"title": "Jarvis",
-  	"icon": "img/jarvis-icon.png",
+    "title": "jarvis",
+    "icon": "img/jarvis-icon.png",
     "show": false,
     "toolbar": false,
     "frame": false,

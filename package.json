@@ -1,0 +1,21 @@
+{
+  "author": "William Gaul",
+  "name": "jarvis",
+  "description": "Just A Really Very Idiotic Shell",
+  "version": "0.1.0",
+  "homepage": "https://github.com/willyg302/jarvis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willyg302/jarvis"
+  },
+  "scripts": {
+    "app": "nodewebkit jarvis-nw",
+    "deploy": "grunt"
+  },
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "grunt-node-webkit-builder": "~0.1.17",
+    "nodewebkit": "~0.8.4-2",
+    "grunt-cli": "~0.1.13"
+  }
+}
