@@ -4,37 +4,39 @@ Just A Really Very Idiotic Shell - version 0.1.0
 
 jarvis is for me, not you (at least at the moment). If you have somehow stumbled upon this repo, hurry along and pay it no heed.
 
-...Still want to run it? Okay. You will need the latest [node-webkit](https://github.com/rogerwang/node-webkit#downloads) installed. Then just do `nw jarvis-nw`.
+...Still want to run it? Okay. Don't say I didn't warn you.
 
-## Workflow
+## Setup
 
 > **Note**: On Windows, use the PowerShell instead of CMD.exe! On Linux you may have to do a [symlink](https://github.com/rogerwang/node-webkit/wiki/The-solution-of-lacking-libudev.so.0).
 
-### Prerequisites
+1. Install [Node.js and NPM](http://nodejs.org/) -- ensure that these are in your path!
 
-- [Node.js and NPM](http://nodejs.org/)
-- Git
-- [init-skeleton](https://github.com/paulmillr/init-skeleton): `npm install -g init-skeleton`
+2. Make sure Git is installed on your system (`git --version`, for Windows [this](http://git-scm.com/) is a good solution)
 
-### Grab jarvis!
+3. Install [init-skeleton](https://github.com/paulmillr/init-skeleton): `npm install -g init-skeleton`
 
-```
-init-skeleton gh:willyg302/jarvis jarvis
-```
+4. Grab jarvis!
 
-### Run That Bad Boy
+   ```
+   init-skeleton gh:willyg302/jarvis jarvis
+   ```
 
-```
-npm run app
-```
+5. Run that bad boy
 
-### Deploy
+   ```
+   npm run app
+   ```
 
-```
-npm run deploy
-```
+6. Ready to build?
 
-The final application builds of jarvis will be located in `/dist` for each major operating system.
+   ```
+   npm run deploy
+   ```
+
+   The final application builds of jarvis will be located in `dist/` for each major operating system.
+
+> **Note**: The builds actually currently don't work. But they will. Soon.
 
 ## Spec
 

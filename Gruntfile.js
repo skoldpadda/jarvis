@@ -3,8 +3,9 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('jarvis-nw/package.json'),
         nodewebkit: {
             options: {
-                version: "0.8.4",
+                version: '0.8.4',
                 build_dir: './dist',
+                app_name: 'jarvis',
                 mac: true,
                 win: true,
                 linux32: true,

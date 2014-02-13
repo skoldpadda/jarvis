@@ -1,5 +1,8 @@
 {
-  "name": "jarvis",
+  "author": "William Gaul",
+  "name": "jarvis-shell",
+  "description": "Just A Really Very Idiotic Shell",
+  "version": "0.1.0",
   "main": "index.html",
   "window": {
     "title": "jarvis",
