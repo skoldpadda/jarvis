@@ -1,6 +1,7 @@
 var gui = require('nw.gui'), win = gui.Window.get();
 var os = require('os');
 
+
 // External libraries
 var moment = require('./js/lib/moment.js');
 
@@ -8,8 +9,11 @@ var moment = require('./js/lib/moment.js');
 var Kernel = require('./js/kernel/kernel.js');
 var myKernel = new Kernel();
 
+
+
+
 // User settings
-var settings = require('../user/settings.js');
+var settings = myKernel.userRequire('settings.js');
 
 var theme_manager = require('./js/client/theme.js');
 
@@ -155,6 +159,10 @@ myKernel.on('kernel_out', function(data) {
 
 myKernel.on('kernel_err', function(data) {
     printMessage({"text": "<span style=\"color:" + theme_manager.color('red') + ";\">" + data + "</span>\n"});
+});
+
+myKernel.on('trigger_close', function() {
+    close();
 });
 
 

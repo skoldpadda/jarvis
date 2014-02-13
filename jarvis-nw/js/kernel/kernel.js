@@ -1,5 +1,6 @@
 var events = require('events');
 var cp = require('child_process');
+var path = require('path');
 
 /** BUILT-IN SCRIPTS **/
 // @TODO: aliases?
@@ -28,6 +29,30 @@ function Kernel() {
 
 Kernel.prototype.__proto__ = events.EventEmitter.prototype;
 
+
+/**
+ * require()'s a path relative to the user/ directory.
+ *
+ * NOTE: Terrible hackity hack hack.
+ * The cwd for a packaged app is in a temporary folder, so we have to break out of the executable using process.execPath.
+ *
+ * Unbuilt: jarvis\node_modules\nodewebkit\nodewebkit\nw.exe
+ * Built:   jarvis\dist\releases\jarvis\win\jarvis\jarvis.exe
+ * 
+ * So we can place the user/ folder:
+ * Unbuilt: jarvis\
+ * Built:   jarvis\dist\releases\
+ *
+ * And then require it with the path below. (IS THIS BAD YES)
+ *
+ * @TODO: More realistically, we should have a bundled user/ folder which we copy to a reliable directory, such as
+ * that returned by getUserHome(), if it doesn't already exist. This would only have to be done once (or whenever
+ * the user decides to purge their config).
+ */
+Kernel.prototype.userRequire = function(filepath) {
+    return require(path.resolve(process.execPath, "../../../../user/" + filepath));
+}
+
 Kernel.prototype.userInput = function(input) {
     var self = this;
 
@@ -50,10 +75,25 @@ Kernel.prototype.userInput = function(input) {
     var cmd = parsed[0];
     var args = parsed.slice(1);
 
+    // Close?
+    if (['exit', 'quit', 'bye'].indexOf(cmd) > -1) {
+        self.emit('trigger_close');
+        return;
+    }
+
+
     // Where cmd is a string
     if (cmd in builtins && typeof builtins[cmd] === "function") {
         self.emit('kernel_out', builtins[cmd](args));
         return;
+    }
+
+    try {
+        var script = self.userRequire("scripts/" + cmd);
+        self.emit('kernel_out', script.run(args));
+        return;
+    } catch (err) {
+        console.log(err);
     }
 
 

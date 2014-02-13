@@ -7,8 +7,8 @@
   "window": {
     "title": "jarvis",
     "icon": "img/jarvis-icon.png",
-    "show": false,
-    "toolbar": false,
+    "show": true,
+    "toolbar": true,
     "frame": false,
     "position": "center",
     "width": 720,
