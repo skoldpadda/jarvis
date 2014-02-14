@@ -34,6 +34,34 @@ However, upon looking at TermKit's code I was slightly disappointed. A lot of th
 
   For all its shortcomings, bash has stood the test of time because it does what it does remarkably well. jarvis is not intended to be its replacement, but rather a supplement focusing on the above goals. As such, things like full-screen buffers (e.g. vi, emacs) and bash scripting will not be supported.
 
+## Dependencies
+
+**General Rule**: Avoid dependencies if at all possible.
+
+### [fs-extra](https://github.com/jprichardson/node-fs-extra)
+
+> **Status**: Included
+
+Used mostly for the crucial `copySync()` function, which emulates `cp -r` and allows us to copy the user folder out of the shell on first run. Also has a lot of other functions that may be useful.
+
+### [nedb](https://github.com/louischatriot/nedb)
+
+> **Status**: Included
+
+Not currently in use, but is recommended by and has support for node-webkit. It is also pseudo-MongoDB, which will prove useful later.
+
+### CoffeeScript
+
+> **Status**: Undecided
+
+GitHub says to write all new applications in CoffeeScript, and the language is really great. But we have to remember our general rule. So far, there has been no reason to drop pure JavaScript in favor of CoffeeScript.
+
+### jQuery
+
+> **Status**: Undecided
+
+As most of our JavaScript is backend-related and not with the DOM, jQuery is likely not that useful.
+
 ## Architecture
 
 @TODO

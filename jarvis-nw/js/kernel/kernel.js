@@ -42,7 +42,7 @@ Kernel.prototype.postInit = function() {
 
 
 Kernel.prototype.jarvisMessage = function(message) {
-    this.emit('message', {"author": "jarvis", "tag": "Jarvis > ", "text": message + "\n"});
+    this.emit('message', {"author": "jarvis", "tag": "jarvis > ", "text": message + "\n"});
 };
 
 Kernel.prototype.userMessage = function(message) {
@@ -85,12 +85,13 @@ Kernel.prototype.userInput = function(input) {
         return;
     }
 
+    // @TODO: Consider, is try-catching errant input too expensive?
     try {
-        var script = self.userRequire("scripts/" + cmd);
+        var script = utils.userRequire("scripts/" + cmd);
         self.emit('kernel_out', script.run(args));
         return;
     } catch (err) {
-        console.log(err);
+        //console.log(err);
     }
 
 

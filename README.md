@@ -1,6 +1,8 @@
-# jarvis
+![jarvis](https://raw.github.com/willyg302/jarvis/master/media/jarvis-logo.png "Sometimes you have to run before you can walk")
 
-Just A Really Very Idiotic Shell - version 0.1.0
+---
+
+**Just A Really Very Idiotic Shell** -- version 0.1.0
 
 jarvis is for me, not you (at least at the moment). If you have somehow stumbled upon this repo, hurry along and pay it no heed.
 
@@ -35,8 +37,6 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
    ```
 
    The final application builds of jarvis will be located in `dist/` for each major operating system.
-
-> **Note**: The builds actually currently don't work. But they will. Soon.
 
 ## Spec
 

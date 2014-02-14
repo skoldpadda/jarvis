@@ -5,12 +5,6 @@ var Kernel = require('./js/kernel/kernel.js');
 var utils = require('./js/kernel/utils.js');
 var kernel = new Kernel();
 
-
-
-
-// User settings
-//var settings = kernel.userRequire('settings.js');
-
 var theme_manager = require('./js/client/theme.js');
 
 
@@ -116,11 +110,8 @@ function printMessage(message) {
     content.parentNode.scrollTop = content.parentNode.scrollHeight;
 }
 
-
-
-
 function resetTitlebarText(text) {
-    document.getElementsByClassName("titlebar-text")[0].innerHTML = "Jarvis - " + text;
+    document.getElementsByClassName("titlebar-text")[0].innerHTML = "jarvis - " + text;
 }
 
 function onInputBarKeypress(e) {
@@ -155,23 +146,18 @@ kernel.on('trigger_close', function() {
 window.onload = function() {
     // Start our kernel @TODO: asynchronously?
     kernel.boot();
-    var settings = utils.userRequire('settings.js');
 
+    var settings = utils.userRequire('settings.js');  // @NOTE: Cannot userRequire() until AFTER booting kernel!
     refreshTheme(settings.theme);
+    resetTitlebarText(utils.getUserHome());
 
     document.getElementById("inputbar").onkeypress = function(e) {
         onInputBarKeypress(e);
     };
-
-    resetTitlebarText(utils.getUserHome());
-
     win.show();
-
     document.getElementById("inputbar").focus();
-
     kernel.postInit();
 }
-
 
 
 /** WINDOW EVENTS **/
