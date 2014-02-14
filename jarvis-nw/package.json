@@ -1,6 +1,6 @@
 {
   "author": "William Gaul",
-  "name": "jarvis-shell",
+  "name": "jarvis",
   "description": "Just A Really Very Idiotic Shell",
   "version": "0.1.0",
   "main": "index.html",
@@ -15,5 +15,9 @@
     "height": 420,
     "min_width": 380,
     "min_height": 240
+  },
+  "dependencies": {
+    "fs-extra": "~0.8.1",
+    "nedb": "~0.10.3"
   }
 }

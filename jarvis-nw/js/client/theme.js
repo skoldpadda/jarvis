@@ -1,4 +1,5 @@
 var vein = require('../lib/vein.js');
+var utils = require('../kernel/utils.js');
 
 var theme = {};
 
@@ -31,7 +32,7 @@ var default_theme = {
 
 theme.loadTheme = function(name) {
     try {
-        current_theme = require("../../../user/themes/" + name + ".js");
+        current_theme = utils.userRequire("themes/" + name + ".js");
     } catch (err) {
         console.log("Could not load theme: " + name + err);
         // If a theme has not been loaded yet, default to [default_theme]

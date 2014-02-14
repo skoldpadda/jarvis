@@ -1,24 +1,16 @@
-var events = require('events');
-var cp = require('child_process');
-var path = require('path');
+var os = require('os'),
+    fs = require('fs-extra'),
+    util = require('util'),
+    events = require('events'),
+    path = require('path');
 
-/** BUILT-IN SCRIPTS **/
+// External libraries
+var moment = require('../lib/moment.js');
+
+var utils = require('./utils.js');
+
 // @TODO: aliases?
-// @TODO: should this even be here? more consistent to also make them modules. but also less secure.
-
-var builtins = {};
-
-builtins.help = function(args) {
-    return "help";
-};
-
-builtins.history = function(args) {
-    return "history";
-};
-
-builtins.cd = function(args) {
-    //
-};
+var builtins = require('./builtins.js');
 
 
 /** KERNEL DEFINITION **/
@@ -27,37 +19,42 @@ function Kernel() {
     events.EventEmitter.call(this);
 }
 
-Kernel.prototype.__proto__ = events.EventEmitter.prototype;
+util.inherits(Kernel, events.EventEmitter);
 
 
-/**
- * require()'s a path relative to the user/ directory.
- *
- * NOTE: Terrible hackity hack hack.
- * The cwd for a packaged app is in a temporary folder, so we have to break out of the executable using process.execPath.
- *
- * Unbuilt: jarvis\node_modules\nodewebkit\nodewebkit\nw.exe
- * Built:   jarvis\dist\releases\jarvis\win\jarvis\jarvis.exe
- * 
- * So we can place the user/ folder:
- * Unbuilt: jarvis\
- * Built:   jarvis\dist\releases\
- *
- * And then require it with the path below. (IS THIS BAD YES)
- *
- * @TODO: More realistically, we should have a bundled user/ folder which we copy to a reliable directory, such as
- * that returned by getUserHome(), if it doesn't already exist. This would only have to be done once (or whenever
- * the user decides to purge their config).
- */
-Kernel.prototype.userRequire = function(filepath) {
-    return require(path.resolve(process.execPath, "../../../../user/" + filepath));
-}
+
+
+
+
+Kernel.prototype.boot = function() {
+    // @TODO: Load settings and user folder, if it doesn't exist make it.
+    var u = path.resolve(utils.getUserHome(), 'jarvis-data');
+
+    if (!fs.existsSync(u)) {
+        fs.copySync('./js/user', u);
+    }
+    
+};
+
+Kernel.prototype.postInit = function() {
+    this.jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+};
+
+
+Kernel.prototype.jarvisMessage = function(message) {
+    this.emit('message', {"author": "jarvis", "tag": "Jarvis > ", "text": message + "\n"});
+};
+
+Kernel.prototype.userMessage = function(message) {
+    this.emit('message', {"author": "user", "tag": os.hostname() + " > ", "text": message + "\n"});
+};
+
 
 Kernel.prototype.userInput = function(input) {
     var self = this;
 
     // @TODO: should it really be printed out in all cases?
-    self.emit('user_input_acknowledged', input);
+    self.userMessage(input);
 
     if (!input) {
         return;
@@ -113,6 +110,6 @@ Kernel.prototype.userInput = function(input) {
     self.emit('kernel_err', "Unrecognized command \"" + cmd + "\"");
 
     return self;
-}
+};
 
 module.exports = Kernel;

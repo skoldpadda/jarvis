@@ -1,19 +1,15 @@
 var gui = require('nw.gui'), win = gui.Window.get();
-var os = require('os');
-
-
-// External libraries
-var moment = require('./js/lib/moment.js');
 
 // Our kernel
 var Kernel = require('./js/kernel/kernel.js');
-var myKernel = new Kernel();
+var utils = require('./js/kernel/utils.js');
+var kernel = new Kernel();
 
 
 
 
 // User settings
-var settings = myKernel.userRequire('settings.js');
+//var settings = kernel.userRequire('settings.js');
 
 var theme_manager = require('./js/client/theme.js');
 
@@ -120,18 +116,8 @@ function printMessage(message) {
     content.parentNode.scrollTop = content.parentNode.scrollHeight;
 }
 
-function jarvisMessage(message) {
-    printMessage({"author": "jarvis", "tag": "Jarvis > ", "text": message + "\n"});
-}
-
-function userMessage(message) {
-    printMessage({"author": "user", "tag": os.hostname() + " > ", "text": message + "\n"});
-}
 
 
-function getUserHome() {
-    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-}
 
 function resetTitlebarText(text) {
     document.getElementsByClassName("titlebar-text")[0].innerHTML = "Jarvis - " + text;
@@ -145,40 +131,45 @@ function onInputBarKeypress(e) {
     if (e.keyCode == 10 || e.keyCode == 13) {
         user_input = document.getElementById("inputbar").value;
         document.getElementById("inputbar").value = "";
-        myKernel.userInput(user_input);
+        kernel.userInput(user_input);
     }
 }
 
-myKernel.on('user_input_acknowledged', function(input) {
-    userMessage(input);
+kernel.on('message', function(data) {
+    printMessage(data);
 });
 
-myKernel.on('kernel_out', function(data) {
+kernel.on('kernel_out', function(data) {
     printMessage({"text": data + "\n"});
 });
 
-myKernel.on('kernel_err', function(data) {
+kernel.on('kernel_err', function(data) {
     printMessage({"text": "<span style=\"color:" + theme_manager.color('red') + ";\">" + data + "</span>\n"});
 });
 
-myKernel.on('trigger_close', function() {
+kernel.on('trigger_close', function() {
     close();
 });
 
 
 window.onload = function() {
+    // Start our kernel @TODO: asynchronously?
+    kernel.boot();
+    var settings = utils.userRequire('settings.js');
+
     refreshTheme(settings.theme);
 
     document.getElementById("inputbar").onkeypress = function(e) {
         onInputBarKeypress(e);
     };
 
-    resetTitlebarText(getUserHome());
+    resetTitlebarText(utils.getUserHome());
 
     win.show();
 
     document.getElementById("inputbar").focus();
-    jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+
+    kernel.postInit();
 }
 
 
