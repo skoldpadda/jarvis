@@ -22,10 +22,6 @@ function Kernel() {
 util.inherits(Kernel, events.EventEmitter);
 
 
-
-
-
-
 Kernel.prototype.boot = function() {
     // @TODO: Load settings and user folder, if it doesn't exist make it.
     var u = path.resolve(utils.getUserHome(), 'jarvis-data');
@@ -42,7 +38,7 @@ Kernel.prototype.postInit = function() {
 
 
 Kernel.prototype.jarvisMessage = function(message) {
-    this.emit('message', {"author": "jarvis", "tag": "jarvis > ", "text": message + "\n"});
+    this.emit('message', {"author": "jarvis", "tag": JARVIS.NAME + " > ", "text": message + "\n"});
 };
 
 Kernel.prototype.userMessage = function(message) {
@@ -88,10 +84,26 @@ Kernel.prototype.userInput = function(input) {
     // @TODO: Consider, is try-catching errant input too expensive?
     try {
         var script = utils.userRequire("scripts/" + cmd);
-        self.emit('kernel_out', script.run(args));
+        var out = script.run(args);
+        if (out) {
+            self.emit('kernel_out', out);
+        }
         return;
     } catch (err) {
         //console.log(err);
+    }
+
+
+    // @TODO: This is great for debugging, but it should be copied over...(into jarvis-data/)
+    try {
+        var script = require("../user/scripts/" + cmd);
+        var out = script.run(args);
+        if (out) {
+            self.emit('kernel_out', out);
+        }
+        return;
+    } catch (err) {
+        console.log(err);
     }
 
 

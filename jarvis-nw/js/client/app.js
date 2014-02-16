@@ -1,4 +1,16 @@
-var gui = require('nw.gui'), win = gui.Window.get();
+var JARVIS = window.JARVIS = global.JARVIS = {
+    gui: require('nw.gui'),
+    win: require('nw.gui').Window.get(),
+
+    NAME: 'jarvis',
+    VERSION: '0.1.0',
+    DEBUG: true,
+
+    PLATFORM_WINDOWS: process.platform === 'win32',
+    PLATFORM_MAC: process.platform === 'darwin',
+    PLATFORM_LINUX: process.platform === 'linux'
+};
+
 
 // Our kernel
 var Kernel = require('./js/kernel/kernel.js');
@@ -45,24 +57,24 @@ function createButton(name, theme, func) {
 }
 
 function minimize() {
-    win.minimize();
+    JARVIS.win.minimize();
 }
 
 function maximize() {
-    win.maximize();
+    JARVIS.win.maximize();
 }
 
 function restore() {
-    win.unmaximize();
+    JARVIS.win.unmaximize();
 }
 
 function close() {
-    win.close();
+    JARVIS.win.close();
 }
 
 function ctrlpanel() {
     // @TODO: This is convenient, but really we need our own control panel
-    win.showDevTools();
+    //JARVIS.win.showDevTools();
 }
 
 
@@ -111,7 +123,7 @@ function printMessage(message) {
 }
 
 function resetTitlebarText(text) {
-    document.getElementsByClassName("titlebar-text")[0].innerHTML = "jarvis - " + text;
+    document.getElementsByClassName("titlebar-text")[0].innerHTML = JARVIS.NAME + " - " + text;
 }
 
 function onInputBarKeypress(e) {
@@ -154,26 +166,32 @@ window.onload = function() {
     document.getElementById("inputbar").onkeypress = function(e) {
         onInputBarKeypress(e);
     };
-    win.show();
+    JARVIS.win.show();
     document.getElementById("inputbar").focus();
     kernel.postInit();
 }
 
+window.addEventListener('keydown', function(e) {
+    if (e.keyIdentifier === 'F12') {
+        JARVIS.win.showDevTools();
+    }
+});
+
 
 /** WINDOW EVENTS **/
 
-win.on('close', function() {
+JARVIS.win.on('close', function() {
     this.hide();  // Pretend to be closed already
     // Do things that need cleaning up
     this.close(true);
 });
 
-win.on('maximize', function() {
+JARVIS.win.on('maximize', function() {
     document.getElementById("maximize").style.visibility = "hidden";
     document.getElementById("restore").style.visibility = "visible";
 });
 
-win.on('unmaximize', function() {
+JARVIS.win.on('unmaximize', function() {
     document.getElementById("restore").style.visibility = "hidden";
     document.getElementById("maximize").style.visibility = "visible";
 });
