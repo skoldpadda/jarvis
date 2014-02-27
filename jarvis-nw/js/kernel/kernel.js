@@ -42,7 +42,7 @@ Kernel.prototype.jarvisMessage = function(message) {
 };
 
 Kernel.prototype.userMessage = function(message) {
-    this.emit('message', {"author": "user", "tag": os.hostname() + " > ", "text": message + "\n"});
+    this.emit('message', {"author": "user", "tag": os.hostname().split('.').shift() + " > ", "text": message + "\n"});
 };
 
 
