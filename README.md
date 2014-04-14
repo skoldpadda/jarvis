@@ -16,27 +16,34 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
 
 2. Make sure Git is installed on your system (`git --version`, for Windows [this](http://git-scm.com/) is a good solution)
 
-3. Install [init-skeleton](https://github.com/paulmillr/init-skeleton): `npm install -g init-skeleton`
+3. Get [Python](http://www.python.org/) (we use 2.7)
 
-4. Grab jarvis!
+4. Install [init-skeleton](https://github.com/paulmillr/init-skeleton): `npm install -g init-skeleton`
+
+5. Grab jarvis!
 
    ```
    init-skeleton gh:willyg302/jarvis jarvis
    ```
 
-5. Run that bad boy
+### Running
 
-   ```
-   npm run app
-   ```
+Made it this far? Awesome. Now run that bad boy.
 
-6. Ready to build?
+```bash
+python kernel  # Start the kernel
+npm run app    # Run our node-webkit frontend
+```
 
-   ```
-   npm run deploy
-   ```
+### Building
 
-   The final application builds of jarvis will be located in `dist/` for each major operating system.
+> **Note**: Currently only builds the node-webkit GUI. Eventually, the kernel should be packaged along with the app (somehow).
+
+```
+npm run deploy
+```
+
+The final application builds of jarvis will be located in `dist/` for each major operating system.
 
 ## Spec
 
