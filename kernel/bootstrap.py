@@ -40,7 +40,7 @@ def check_env():
 # Install all necessary requirements to the virtual environment
 def install_requirements():
 	print('== 3. Installing requirements ==')
-	call_virtual('easy_install pyzmq')
+	call_virtual('pip install sockjs-tornado')
 	call_virtual('pip freeze > {}'.format(REQUIREMENTS))
 
 

@@ -1,18 +1,24 @@
-import zmq
+from tornado import ioloop, web
 
-pub_port = '5556'
-con_port = '5557'
+from sockjs.tornado import SockJSConnection, SockJSRouter
 
-context = zmq.Context()
 
-con_socket = context.socket(zmq.REP)
-con_socket.bind('tcp://127.0.0.1:{}'.format(con_port))
+class KernelConnection(SockJSConnection):
+	participants = set()
 
-pub_socket = context.socket(zmq.PUB)
-pub_socket.bind('tcp://127.0.0.1:{}'.format(pub_port))
+	def on_open(self, info):
+		self.broadcast(self.participants, 'Someone has joined.')
+		self.participants.add(self)
 
-while True:
-	msg = con_socket.recv_pyobj()
-	print 'Received request [{}]: {}'.format(msg[0], msg[1])
-	con_socket.send('Request {} acknowledged'.format(msg[1]))
-	pub_socket.send_pyobj(msg)
+	def on_message(self, message):
+		self.broadcast(self.participants, message)
+
+	def on_close(self):
+		self.participants.remove(self)
+		self.broadcast(self.participants, 'Someone has left.')
+
+
+if __name__ == '__main__':
+	KernelRouter = SockJSRouter(KernelConnection, '/kernel')
+	web.Application(KernelRouter.urls).listen(8080)
+	ioloop.IOLoop.instance().start()
