@@ -13,6 +13,9 @@ body {
     margin: 0;
     padding: 0;
     min-width: 360px;
+
+    background-color: #ffffff;
+    color: #1d1f21;
 }
 
 
@@ -20,6 +23,19 @@ body {
 
 ::-webkit-scrollbar {
     width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #e0e0e0;
+    border-left: 1px solid #c5c8c6;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #c5c8c6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #b4b7b4;
 }
 
 
@@ -56,6 +72,9 @@ body {
 .bar {
     -webkit-user-select: none;
     -webkit-app-region: drag;
+
+    background-color: #e0e0e0;
+    box-shadow: 0 0 10px 2px #969896;
 }
 
 .btn {
@@ -75,28 +94,6 @@ body {
     width: 80%;
     margin-top: 6px;
     margin-bottom: 6px;
-}
-
-#minimize, #maximize, #close, #restore {
-    position: absolute;
-    width: 30px;
-    height: 26px;
-}
-
-#minimize {
-    right: 60px;
-}
-
-#maximize, #restore {
-    right: 30px;
-}
-
-#close {
-    right: 0px;
-}
-
-#restore {
-    visibility: hidden;
 }
 
 #ctrlpanel {
@@ -135,6 +132,15 @@ input#inputbar {
     transition: box-shadow .25s ease-in-out, border-color .25s ease-in-out;
     -webkit-transition: -webkit-box-shadow .25s ease-in-out, border-color .25s ease-in-out;
     -webkit-app-region: no-drag;
+
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #1d1f21;
+}
+
+input#inputbar:focus {
+    box-shadow: 0 0 5px 0 #3e999f;
+    border-color: #3e999f;
 }
 
 
@@ -142,10 +148,12 @@ input#inputbar {
 
 span.jarvis {
     font-weight: bold;
+    color: #f5871f;
 }
 
 span.user {
     font-weight: bold;
+    color: #4271ae;
 }
 
 span.app {

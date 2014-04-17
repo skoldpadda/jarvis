@@ -1,21 +1,9 @@
-var JARVIS = window.JARVIS = global.JARVIS = {
-    gui: require('nw.gui'),
-    win: require('nw.gui').Window.get(),
-
+var JARVIS = window.JARVIS = {
     NAME: 'jarvis',
     VERSION: '0.1.0',
     DEBUG: true,
-
-    PLATFORM_WINDOWS: process.platform === 'win32',
-    PLATFORM_MAC: process.platform === 'darwin',
-    PLATFORM_LINUX: process.platform === 'linux'
 };
 
-var fs = require('fs-extra'),
-    path = require('path');
-
-var utils = require('./js/utils.js'),
-    theme_manager = require('./js/theme.js');
 
 var conn = null;
 var connOpen = false;
@@ -57,60 +45,23 @@ function createButton(name, theme, func) {
     };
 }
 
-function minimize() {
-    JARVIS.win.minimize();
-}
-
-function maximize() {
-    JARVIS.win.maximize();
-}
-
-function restore() {
-    JARVIS.win.unmaximize();
-}
-
-function close() {
-    JARVIS.win.close();
-}
-
 function ctrlpanel() {
     // @TODO: This is convenient, but really we need our own control panel
     //JARVIS.win.showDevTools();
 }
 
 
-function refreshTheme(name) {
-    theme_manager.loadTheme(name);
+function refreshTheme() {
+    var foreground = '#1d1f21';
+    var blue = '#4271ae';
 
-    var foreground = theme_manager.color('foreground');
-    var blue = theme_manager.color('blue');
-    var red = theme_manager.color('red');
-    var titlebar = theme_manager.color('titlebar');
-
-    var but1 = {
-        'up': {'bg': {'color': foreground, 'opacity': '0.0'}, 'fg': {'color': foreground, 'opacity': '0.2'}},
-        'over': {'bg': {'color': foreground, 'opacity': '0.08'}, 'fg': {'color': foreground, 'opacity': '1.0'}},
-        'down': {'bg': {'color': blue, 'opacity': '1.0'}, 'fg': {'color': titlebar, 'opacity': '1.0'}}
-    };
-    var but2 = {
-        'up': {'bg': {'color': foreground, 'opacity': '0.0'}, 'fg': {'color': foreground, 'opacity': '0.2'}},
-        'over': {'bg': {'color': red, 'opacity': '1.0'}, 'fg': {'color': titlebar, 'opacity': '1.0'}},
-        'down': {'bg': {'color': foreground, 'opacity': '1.0'}, 'fg': {'color': titlebar, 'opacity': '1.0'}}
-    };
-    var but3 = {
+    var but = {
         'up': {'bg': {'color': foreground, 'opacity': '0.0'}, 'fg': {'color': foreground, 'opacity': '0.2'}},
         'over': {'bg': {'color': foreground, 'opacity': '0.0'}, 'fg': {'color': foreground, 'opacity': '1.0'}},
         'down': {'bg': {'color': foreground, 'opacity': '0.0'}, 'fg': {'color': blue, 'opacity': '1.0'}}
     };
 
-    createButton('minimize', but1, minimize);
-    createButton('maximize', but1, maximize);
-    createButton('restore', but1, restore);
-    createButton('close', but2, close);
-    createButton('ctrlpanel', but3, ctrlpanel);
-
-    // Now we reset CSS
-    theme_manager.resetCSS(document);
+    createButton('ctrlpanel', but, ctrlpanel);
 }
 
 function resetTitlebarText(text) {
@@ -139,7 +90,7 @@ function sendToKernel(obj) {
 function userMessage(message) {
     sendToKernel({
         'author': 'user',
-        'tag': utils.getUserName(),
+        'tag': 'User',  // @TODO
         'text': message
     });
 }
@@ -168,14 +119,6 @@ function onInputBarKeypress(e) {
 
 /** INITIALIZATION **/
 
-// Load settings and user folder, if it doesn't exist make it.
-function checkSettings() {
-    var u = path.resolve(utils.getUserHome(), 'jarvis-data');
-    if (!fs.existsSync(u)) {
-        fs.copySync('./js/user', u);
-    }
-}
-
 function initSockJS() {
     appMessage('Connecting to kernel...');
     conn = new SockJS('http://localhost:8080/kernel');
@@ -193,42 +136,10 @@ function initSockJS() {
 }
 
 window.onload = function() {
-    checkSettings();
-    var settings = utils.userRequire('settings.js');  // @NOTE: Cannot userRequire() until AFTER checkSettings()!
-    refreshTheme(settings.theme);
-    resetTitlebarText(utils.getUserHome());
+    refreshTheme();
+    resetTitlebarText(JARVIS.NAME);  // @TODO: this
     document.getElementById('inputbar').onkeypress = onInputBarKeypress;
-    JARVIS.win.show();
     document.getElementById('inputbar').focus();
 
     initSockJS();
 };
-
-window.addEventListener('keydown', function(e) {
-    if (e.keyIdentifier === 'F12') {
-        JARVIS.win.showDevTools();
-    }
-});
-
-
-/** WINDOW EVENTS **/
-
-JARVIS.win.on('close', function() {
-    this.hide();  // Pretend to be closed already
-    // Do things that need cleaning up
-    if (connOpen) {
-        conn.close();
-        conn = null;
-    }
-    this.close(true);
-});
-
-JARVIS.win.on('maximize', function() {
-    document.getElementById('maximize').style.visibility = 'hidden';
-    document.getElementById('restore').style.visibility = 'visible';
-});
-
-JARVIS.win.on('unmaximize', function() {
-    document.getElementById('restore').style.visibility = 'hidden';
-    document.getElementById('maximize').style.visibility = 'visible';
-});
