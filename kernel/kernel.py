@@ -1,51 +1,37 @@
-var os = require('os'),
-    fs = require('fs-extra'),
-    util = require('util'),
-    events = require('events'),
-    path = require('path');
+import shlex
 
-// External libraries
-var moment = require('../lib/moment.js');
-
-var utils = require('./utils.js');
-
-// @TODO: aliases?
-var builtins = require('./builtins.js');
+from tornado.template import Template
 
 
-/** KERNEL DEFINITION **/
 
-function Kernel() {
-    events.EventEmitter.call(this);
-}
-
-util.inherits(Kernel, events.EventEmitter);
+# https://github.com/willyg302/jarvis/blob/3e254dde64587b58c5fe9c8bcd335815dd3221b5/jarvis.py
 
 
-Kernel.prototype.boot = function() {
-    // @TODO: Load settings and user folder, if it doesn't exist make it.
-    var u = path.resolve(utils.getUserHome(), 'jarvis-data');
 
-    if (!fs.existsSync(u)) {
-        fs.copySync('./js/user', u);
-    }
-    
+
+'''
+var builtins = {};
+
+builtins.help = function(args) {
+    return "help";
 };
 
-Kernel.prototype.postInit = function() {
-    this.jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+builtins.history = function(args) {
+    return "history";
 };
 
-
-Kernel.prototype.jarvisMessage = function(message) {
-    this.emit('message', {"author": "jarvis", "tag": JARVIS.NAME + " > ", "text": message + "\n"});
+builtins.cd = function(args) {
+    //
 };
 
-Kernel.prototype.userMessage = function(message) {
-    this.emit('message', {"author": "user", "tag": os.hostname().split('.').shift() + " > ", "text": message + "\n"});
-};
+module.exports = builtins;
+'''
 
 
+
+
+
+'''
 Kernel.prototype.userInput = function(input) {
     var self = this;
 
@@ -124,5 +110,39 @@ Kernel.prototype.userInput = function(input) {
 
     return self;
 };
+'''
 
-module.exports = Kernel;
+
+
+'''
+
+ def user_enter(self, uin):
+        self.user_message(uin)
+        if uin:
+            # @TODO: This should not happen here. If for example the user types "i'm doing fine" (note the quote)
+            # shlex will throw a ValueError
+            raw_cmd = shlex.split(uin)
+            if raw_cmd[0] in ['exit', 'quit', 'bye']:
+                QCoreApplication.instance().quit()
+            else:
+                runCommand(raw_cmd[0], raw_cmd[1:])
+'''
+
+
+
+class Kernel:
+
+	def __init__(self):
+		pass
+
+	def runCommand(self, command, args):
+		c = self.__class__
+		if hasattr(c, command) and callable(getattr(c, command)):
+			return getattr(c, command)(self, args)
+		return Command.list(command)  # Unrecognized command, show list of known commands
+
+	# Takes a JSON input, returns a JSON output
+	def handle_input(self, string):
+		log.info('Servicing request: {}'.format(string))
+		raw_cmd = shlex.split(string)
+		return self.runCommand(raw_cmd[0], raw_cmd[1:])

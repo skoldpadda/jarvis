@@ -1,5 +1,5 @@
-var vein = require('../lib/vein.js');
-var utils = require('../kernel/utils.js');
+var vein = require('./lib/vein.js');
+var utils = require('./utils.js');
 
 var theme = {};
 
@@ -36,7 +36,7 @@ theme.loadTheme = function(name) {
     } catch (err) {
         console.log("Could not load theme: " + name + err);
         // If a theme has not been loaded yet, default to [default_theme]
-        if (typeof current_theme === 'undefined' || current_theme == null) {
+        if (typeof current_theme === 'undefined' || current_theme === null) {
             current_theme = default_theme;
         }
     }
