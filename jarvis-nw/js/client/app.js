@@ -19,6 +19,8 @@ var kernel = new Kernel();
 
 var theme_manager = require('./js/client/theme.js');
 
+var conn = null;
+
 
 /** BUTTONS **/
 
@@ -134,7 +136,10 @@ function onInputBarKeypress(e) {
     if (e.keyCode == 10 || e.keyCode == 13) {
         user_input = document.getElementById("inputbar").value;
         document.getElementById("inputbar").value = "";
-        kernel.userInput(user_input);
+        //kernel.userInput(user_input);
+        conn.send(JSON.stringify({
+            'text': user_input
+        }));
     }
 }
 
@@ -156,6 +161,20 @@ kernel.on('trigger_close', function() {
 
 
 window.onload = function() {
+    // Initialize SockJS connection
+    conn = new SockJS('http://localhost:8080/kernel');
+    conn.onopen = function() {
+        // @TODO
+    };
+    conn.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        printMessage(data);
+    };
+    conn.onclose = function() {
+        conn = null;
+        // @TODO
+    };
+
     // Start our kernel @TODO: asynchronously?
     kernel.boot();
 
@@ -183,6 +202,10 @@ window.addEventListener('keydown', function(e) {
 JARVIS.win.on('close', function() {
     this.hide();  // Pretend to be closed already
     // Do things that need cleaning up
+    if (conn != null) {
+        conn.close();
+        conn = null;
+    }
     this.close(true);
 });
 
