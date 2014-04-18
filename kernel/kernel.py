@@ -8,6 +8,33 @@ from tornado.template import Template
   - Have a method that allows scripts to send messages arbitrarily (print --> broadcast)
 '''
 
+# Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
+class Event:
+
+	def __init__(self):
+		self.handlers = set()
+
+	def handle(self, handler):
+		self.handlers.add(handler)
+		return self
+
+	def unhandle(self, handler):
+		self.handlers.discard(handler)
+		return self
+
+	def fire(self, *args, **kwargs):
+		for handler in self.handlers:
+			handler(*args, **kwargs)
+
+	def get_handler_count(self):
+		return len(self.handlers)
+
+	__iadd__ = handle
+	__isub__ = unhandle
+	__call__ = fire
+	__len__  = get_handler_count
+
+
 
 # https://github.com/willyg302/jarvis/blob/3e254dde64587b58c5fe9c8bcd335815dd3221b5/jarvis.py
 
@@ -173,7 +200,7 @@ Kernel.prototype.jarvisMessage = function(message) {
 class Kernel:
 
 	def __init__(self):
-		pass
+		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
 
 	def runCommand(self, command, args):
 		c = self.__class__

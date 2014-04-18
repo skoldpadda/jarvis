@@ -15,13 +15,19 @@ class IndexHandler(web.RequestHandler):
 # @TODO: Robustify this
 # @NOTE: [message] can only be a STRING (per WebSocket protocol)
 class KernelConnection(SockJSConnection):
-	room = set()
+
+	def __init__(self, session):
+		super(KernelConnection, self).__init__(session)
+		self.room = set()
+		kernel.direct_channel += self.from_kernel
 
 	def on_open(self, info):
 		# self.broadcast(self.room, 'Someone has joined.')
 		self.room.add(self)
 
 	def on_message(self, message):
+		# @TODO: Currently only user requests get sent here
+		# But not everything should be broadcast. So we have to rethink the logic later on
 		self.broadcast(self.room, message)
 		response = kernel.handle_input(json.loads(message))
 		if response:
@@ -30,6 +36,10 @@ class KernelConnection(SockJSConnection):
 	def on_close(self):
 		self.room.remove(self)
 		# self.broadcast(self.room, 'Someone has left.')
+
+	def from_kernel(self, message):
+		# @TODO: Ability to single out clients
+		self.broadcast(self.room, json.dumps(message))
 
 
 if __name__ == '__main__':
