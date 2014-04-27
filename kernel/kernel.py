@@ -197,23 +197,81 @@ Kernel.prototype.jarvisMessage = function(message) {
 */
 '''
 
+
+
+'''
+IPYTHON
+{
+  # The message header contains a pair of unique identifiers for the
+  # originating session and the actual message id, in addition to the
+  # username for the process that generated the message.  This is useful in
+  # collaborative settings where multiple users may be interacting with the
+  # same kernel simultaneously, so that frontends can label the various
+  # messages in a meaningful way.
+  'header' : {
+                'msg_id' : uuid,
+                'username' : str,
+                'session' : uuid,
+                # All recognized message type strings are listed below.
+                'msg_type' : str,
+     },
+
+  # In a chain of messages, the header from the parent is copied so that
+  # clients can track where messages come from.
+  'parent_header' : dict,
+
+  # Any metadata associated with the message.
+  'metadata' : dict,
+
+  # The actual content of the message must be a dict, whose structure
+  # depends on the message type.
+  'content' : dict,
+}
+
+
+{
+	'header': {
+		'username': User,
+		'type': 'input_request'
+	},
+	'content': {
+		'text': ...
+	}
+}
+
+'''
+
+
 class Kernel:
 
 	def __init__(self):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
 
+	'''
 	def runCommand(self, command, args):
 		c = self.__class__
 		if hasattr(c, command) and callable(getattr(c, command)):
 			return getattr(c, command)(self, args)
 		return Command.list(command)  # Unrecognized command, show list of known commands
+	'''
+
+	def input_request(self, message):
+		if not message['content']['text']:
+			return {}
+
+		self.direct_channel(message)  # Broadcast entire original message to all clients
+
+		return {'text': message['content']['text']}  # @TODO this is not proper format
 
 	# Takes a JSON input, returns a JSON output. Returns empty dict if doesn't want to handle stuff
 	def handle_input(self, message):
 		# log.info('Servicing request: {}'.format(string))
 		# raw_cmd = shlex.split(string)
 		# return self.runCommand(raw_cmd[0], raw_cmd[1:])
-		if not message['text']:
-			return {}
+		
+		c = self.__class__
+		msg_type = message['header']['type']
+		if hasattr(c, msg_type) and callable(getattr(c, msg_type)):
+			return getattr(c, msg_type)(self, message)
 
-		return {'text': message['text']}
+		return {}  # @TODO should return error (invalid message type)

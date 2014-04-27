@@ -1,10 +1,18 @@
 import os
 import json
+import signal
 
 from tornado import ioloop, web
 from sockjs.tornado import SockJSConnection, SockJSRouter
 
 from kernel import Kernel
+
+
+def add_shutdown_signal(signal_type):
+	signal.signal(signal_type, lambda sig, frame: ioloop.IOLoop.instance().add_callback_from_signal(on_shutdown))
+
+def on_shutdown():
+	ioloop.IOLoop.instance().stop()
 
 
 class IndexHandler(web.RequestHandler):
@@ -26,9 +34,6 @@ class KernelConnection(SockJSConnection):
 		self.room.add(self)
 
 	def on_message(self, message):
-		# @TODO: Currently only user requests get sent here
-		# But not everything should be broadcast. So we have to rethink the logic later on
-		self.broadcast(self.room, message)
 		response = kernel.handle_input(json.loads(message))
 		if response:
 			self.broadcast(self.room, json.dumps(response))
@@ -65,4 +70,6 @@ if __name__ == '__main__':
 		[(r'/', IndexHandler)] + KernelRouter.urls,
 		**settings
 	).listen(8080)
+	add_shutdown_signal(signal.SIGINT)
+	add_shutdown_signal(signal.SIGTERM)
 	ioloop.IOLoop.instance().start()

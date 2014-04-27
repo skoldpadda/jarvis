@@ -66,9 +66,19 @@ As most of our JavaScript is backend-related and not with the DOM, jQuery is lik
 
 @TODO
 
+### Kernel and Client
+
+jarvis consists of two distinct halves: an application-agnostic *kernel* that encapsulates core functionality, and a frontend *client* that communicates with the kernel and displays these interactions.
+
+A client must be connected to a kernel to function; when a client is connected, this is called a "session". A kernel may be connected to multiple clients at the same time; this is a shared (or collaborative) session. It may be helpful to think of the kernel as a chatroom, with jarvis as the moderator and various clients as users currently in the room.
+
+For convenience, each running kernel provides a hardline client as a "reference implementation", accessible at the server's root URL. Note that this client has limited features (no settings persistence, no theming, etc.), but is a reference because everything that it can do should also be supported by derivative client implementations.
+
 ## Communication Protocol
 
 @TODO
+
+All communication is done in JSON.
 
 ## Script System
 

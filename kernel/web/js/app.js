@@ -4,6 +4,8 @@ var JARVIS = window.JARVIS = {
     DEBUG: true,
 };
 
+var USERNAME = 'User';  // @TODO allow this to be set (or force it on startup)
+
 
 var conn = null;
 var connOpen = false;
@@ -71,6 +73,7 @@ function resetTitlebarText(text) {
 
 /** MESSAGING **/
 
+// @TODO this is terrible
 function printMessage(message) {
     var content = document.getElementById('content');
     if (message.hasOwnProperty('tag')) {
@@ -89,9 +92,13 @@ function sendToKernel(obj) {
 
 function userMessage(message) {
     sendToKernel({
-        'author': 'user',
-        'tag': 'User',  // @TODO
-        'text': message
+        'header': {
+            'username': USERNAME,
+            'type': 'input_request'
+        },
+        'content': {
+            'text': message
+        }
     });
 }
 
@@ -137,7 +144,7 @@ function initSockJS() {
 
 window.onload = function() {
     refreshTheme();
-    resetTitlebarText(JARVIS.NAME);  // @TODO: this
+    resetTitlebarText('');  // @TODO: this (gets updated by kernel upon handshake)
     document.getElementById('inputbar').onkeypress = onInputBarKeypress;
     document.getElementById('inputbar').focus();
 
