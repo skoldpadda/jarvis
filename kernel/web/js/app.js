@@ -110,6 +110,7 @@ function appMessage(message) {
     });
 }
 
+// @TODO: handlers for tab, up/down arrows, etc. for completion and history
 
 function onInputBarKeypress(e) {
     if (typeof e === 'undefined' && window.event) {
@@ -124,6 +125,38 @@ function onInputBarKeypress(e) {
 }
 
 
+/** MESSAGE HANDLERS **/
+
+var messageHandlers = {
+    input_request: function(data) {
+        printMessage({
+            'author': 'user',
+            'tag': data.header.username,
+            'text': data.content.text
+        });
+    },
+    input_response: function(data) {
+        printMessage({
+            'text': data.content.text
+        });
+    },
+    jarvis_message: function(data) {
+        printMessage({
+            'author': 'jarvis',
+            'tag': JARVIS.NAME,  // @TODO: Kernel-side
+            'text': data.content.text
+        });
+    },
+    handshake_response: function(data) {
+        USERNAME = data.header.username;
+    }
+};
+
+function handleKernelMessage(data) {
+    messageHandlers[data.header.type](data);
+}
+
+
 /** INITIALIZATION **/
 
 function initSockJS() {
@@ -131,10 +164,16 @@ function initSockJS() {
     conn = new SockJS('http://localhost:8080/kernel');
     conn.onopen = function() {
         connOpen = true;
+        sendToKernel({
+            'header': {
+                'username': USERNAME,
+                'type': 'handshake_request'
+            }
+        });
     };
     conn.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        printMessage(data);
+        handleKernelMessage(data);
     };
     conn.onclose = function() {
         conn = null;

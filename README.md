@@ -53,12 +53,9 @@ For more about the project's goals and design, see the [spec](spec.md).
 
 ## Todo
 
-Besides everything marked [`@TODO`](https://github.com/willyg302/jarvis/search?q=%22%40TODO%22) in any source file. **Note**: completed tasks are marked with a ✔.
+Besides everything marked [`@TODO`](https://github.com/willyg302/jarvis/search?q=%22%40TODO%22) in any source file.
 
-☐ Provide methods for running built-in shell commands, possibly via [shell.js](https://github.com/arturadib/shelljs)
-
-☐ Settings file (akin to bash profiles) -- also manageable through Control Panel?
-
-☐ Establish reliable, extensible kernel/client protocol
-
-☐ Control Panel (settings, theme management, etc.)
+- [ ] Provide methods for running built-in shell commands, possibly via [shell.js](https://github.com/arturadib/shelljs)
+- [ ] Settings file (akin to bash profiles) -- also manageable through Control Panel?
+- [ ] Establish reliable, extensible kernel/client protocol
+- [ ] Control Panel (settings, theme management, etc.)

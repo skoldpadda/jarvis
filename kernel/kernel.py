@@ -1,4 +1,6 @@
 import shlex
+import uuid
+import datetime
 
 from tornado.template import Template
 
@@ -261,7 +263,35 @@ class Kernel:
 
 		self.direct_channel(message)  # Broadcast entire original message to all clients
 
-		return {'text': message['content']['text']}  # @TODO this is not proper format
+		return {
+			'header': {
+				'username': message['header']['username'],
+				'type': 'input_response'
+			},
+			'content': {
+				'text': message['content']['text']
+			}
+		}
+
+
+	# str(uuid.uuid4().fields[0])[:5] to generate random 5-digit string for default username
+	def handshake_request(self, message):
+		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])
+		self.direct_channel({
+			'header': {
+				'username': user,
+				'type': 'jarvis_message'
+			},
+			'content': {
+				'text': '{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+			}
+		})
+		return {
+			'header': {
+				'username': user,
+				'type': 'handshake_response'
+			}
+		}
 
 	# Takes a JSON input, returns a JSON output. Returns empty dict if doesn't want to handle stuff
 	def handle_input(self, message):
