@@ -20,7 +20,7 @@ class IndexHandler(web.RequestHandler):
 		self.render('web/index.html')
 
 
-# @TODO: Robustify this
+# @TODO: Robustify this, and do we even need [room] anymore?
 # @NOTE: [message] can only be a STRING (per WebSocket protocol)
 class KernelConnection(SockJSConnection):
 
