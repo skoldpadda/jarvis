@@ -11,6 +11,7 @@ from tornado.template import Template
 '''
 
 # Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
+# @TODO: Ability to single out clients
 class Event:
 
 	def __init__(self):
@@ -175,28 +176,6 @@ kernel.on('kernel_err', function(data) {
 kernel.on('trigger_close', function() {
 	close();
 });
-
-
-Kernel.prototype.jarvisMessage = function(message) {
-	this.emit('message', {"author": "jarvis", "tag": JARVIS.NAME + " > ", "text": message + "\n"});
-};
-
-'''
-
-'''
-/*
-
-Kernel.prototype.postInit = function() {
-	this.jarvisMessage("Starting up on " + moment().format('MMMM Do YYYY, h:mm:ss a'));
-};
-
-
-Kernel.prototype.jarvisMessage = function(message) {
-	this.emit('message', {"author": "jarvis", "tag": JARVIS.NAME + " > ", "text": message + "\n"});
-};
-
-
-*/
 '''
 
 
@@ -250,20 +229,21 @@ class Kernel:
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
 
 	'''
-	def runCommand(self, command, args):
-		c = self.__class__
-		if hasattr(c, command) and callable(getattr(c, command)):
-			return getattr(c, command)(self, args)
-		return Command.list(command)  # Unrecognized command, show list of known commands
+	Each of the methods below handles a single type of message sent from a client.
+	To broadcast a message to all connected clients, send it through self.direct_channel().
+	You may also optionally return a message; this will only go to the calling client.
 	'''
 
 	def input_request(self, message):
-		if not message['content']['text']:
-			return {}
-
 		self.direct_channel(message)  # Broadcast entire original message to all clients
 
-		return {
+		if not message['content']['text']:
+			return
+
+		# raw_cmd = shlex.split(string)
+		# return self.runCommand(raw_cmd[0], raw_cmd[1:])
+
+		self.direct_channel({
 			'header': {
 				'username': message['header']['username'],
 				'type': 'input_response'
@@ -271,12 +251,11 @@ class Kernel:
 			'content': {
 				'text': message['content']['text']
 			}
-		}
+		})
 
 
-	# str(uuid.uuid4().fields[0])[:5] to generate random 5-digit string for default username
 	def handshake_request(self, message):
-		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])
+		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])  # Random 5-digit assigned username
 		self.direct_channel({
 			'header': {
 				'username': user,
@@ -293,15 +272,11 @@ class Kernel:
 			}
 		}
 
-	# Takes a JSON input, returns a JSON output. Returns empty dict if doesn't want to handle stuff
+	# Takes a JSON input, returns a JSON output (or nothing if it doesn't want to handle stuff)
 	def handle_input(self, message):
-		# log.info('Servicing request: {}'.format(string))
-		# raw_cmd = shlex.split(string)
-		# return self.runCommand(raw_cmd[0], raw_cmd[1:])
-		
 		c = self.__class__
 		msg_type = message['header']['type']
 		if hasattr(c, msg_type) and callable(getattr(c, msg_type)):
 			return getattr(c, msg_type)(self, message)
 
-		return {}  # @TODO should return error (invalid message type)
+		# @TODO should return error (invalid message type)

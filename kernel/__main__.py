@@ -24,9 +24,10 @@ class IndexHandler(web.RequestHandler):
 # @NOTE: [message] can only be a STRING (per WebSocket protocol)
 class KernelConnection(SockJSConnection):
 
+	room = set()
+
 	def __init__(self, session):
 		super(KernelConnection, self).__init__(session)
-		self.room = set()
 		kernel.direct_channel += self.from_kernel
 
 	def on_open(self, info):
@@ -36,15 +37,14 @@ class KernelConnection(SockJSConnection):
 	def on_message(self, message):
 		response = kernel.handle_input(json.loads(message))
 		if response:
-			self.broadcast(self.room, json.dumps(response))
+			self.send(json.dumps(response))
 
 	def on_close(self):
 		self.room.remove(self)
 		# self.broadcast(self.room, 'Someone has left.')
 
 	def from_kernel(self, message):
-		# @TODO: Ability to single out clients
-		self.broadcast(self.room, json.dumps(message))
+		self.send(json.dumps(message))
 
 
 if __name__ == '__main__':
