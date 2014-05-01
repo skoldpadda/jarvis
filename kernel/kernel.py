@@ -1,14 +1,26 @@
+import os
 import shlex
 import uuid
 import datetime
 
 from tornado.template import Template
 
+from plugins import *
+
 
 '''
-@TODO:
-  - Have a method that allows scripts to send messages arbitrarily (print --> broadcast)
+@TODO
+ - Is it better to explicitly have scripts call shell.out(), or should
+   we capture/redirect stdout/stderr to allow implicit print() -ing?
+
+ - Okay so a huge problem is everything is blocking. Should be async.
+   Example: if a builtin function calls time.sleep(5) between print calls,
+   it will print once, wait 5 seconds, then print again. So far so good.
+   But then if the user types something else between the print calls, it gets
+   buffered until the previous command finishes. MAYBE THAT'S A GOOD THING?
+   Do we want users to interleave commands, or wait until each is done?
 '''
+
 
 # Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
 # @TODO: Ability to single out clients
@@ -45,14 +57,14 @@ class Event:
 
 
 # @TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
-def cd(args):
-	return 'cd'
+def cd(shell, args):
+	shell.out('You typed cd')
 
-def help(args):
-	return 'help'
+def help(shell, args):
+	shell.out('You typed help')
 
-def history(args):
-	return 'history'
+def history(shell, args):
+	shell.out('You typed history')
 
 
 # A dictionary of commands in this file
@@ -63,119 +75,26 @@ builtins = {
 }
 
 
-
-
-'''
-Kernel.prototype.userInput = function(input) {
-	var self = this;
-
-	// @TODO: should it really be printed out in all cases?
-	self.userMessage(input);
-
-	if (!input) {
-		return;
-	}
-
-	/**
-	 * 1. Is it a built-in function? (right in this class)
-	 * 2. Is it a script in plugins/ folder (recursive)?
-	 * 3. Is it a native shell command?
-	 * 4. Pass to semantic analyzer
-	 */
-
-	// @TODO: This is horrible hack
-	var parsed = input.match(/(?:[^\s"]+|"[^"]*")+/g);
-	var cmd = parsed[0];
-	var args = parsed.slice(1);
-
-	// Close?
-	if (['exit', 'quit', 'bye'].indexOf(cmd) > -1) {
-		self.emit('trigger_close');
-		return;
-	}
-
-
-	// Where cmd is a string
-	if (cmd in builtins && typeof builtins[cmd] === "function") {
-		self.emit('kernel_out', builtins[cmd](args));
-		return;
-	}
-
-	// @TODO: Consider, is try-catching errant input too expensive?
-	try {
-		var script = utils.userRequire("scripts/" + cmd);
-		var out = script.run(args);
-		if (out) {
-			self.emit('kernel_out', out);
-		}
-		return;
-	} catch (err) {
-		//console.log(err);
-	}
-
-
-	// @TODO: This is great for debugging, but it should be copied over...(into jarvis-data/)
-	try {
-		var script = require("../user/scripts/" + cmd);
-		var out = script.run(args);
-		if (out) {
-			self.emit('kernel_out', out);
-		}
-		return;
-	} catch (err) {
-		console.log(err);
-	}
-
-
-	/** So it turns out fork() is broken in node-webkit. This is a bummer. https://github.com/rogerwang/node-webkit/issues/213
-	 * Not that we'd really NEED async second-process execution though? I mean it's cleaner...
-	 * but in the Jarvis model in -> out makes just as much sense.
-	 * Possible workaround: https://gist.github.com/iamkvein/2006752
-	 * Basically, we implement our own common abstraction, or perhaps intercept process.stdout/stderr.
-	var child = cp.fork("./plugins/" + cmd);
-	child.stdout.on('data', function(data) {
-		console.log('stdout: ' + data);
-	});
-	child.send(args);
-	*/
-
-
-	self.emit('kernel_err', "Unrecognized command \"" + cmd + "\"");
-
-	return self;
-};
-'''
-
-
+# A dictionary of plugins that Jarvis knows about
 
 '''
+plugins = {}
 
- def user_enter(self, uin):
-		self.user_message(uin)
-		if uin:
-			# @TODO: This should not happen here. If for example the user types "i'm doing fine" (note the quote)
-			# shlex will throw a ValueError
-			raw_cmd = shlex.split(uin)
-			if raw_cmd[0] in ['exit', 'quit', 'bye']:
-				QCoreApplication.instance().quit()
-			else:
-				runCommand(raw_cmd[0], raw_cmd[1:])
-'''
+def load_plugin(name):
+	try:
+		#plugin = __import__('plugins.{}'.format(name), fromlist=['plugins'])
+		plugin = __import__('kernel.plugins', fromlist=[name])
+	except ImportError, e:
+		print e
+		return None
+	plugins[name] = plugin
+	return plugin
 
-
-
-'''
-kernel.on('kernel_out', function(data) {
-	printMessage({"text": data + "\n"});
-});
-
-kernel.on('kernel_err', function(data) {
-	printMessage({"text": "<span style=\"color:" + theme_manager.color('red') + ";\">" + data + "</span>\n"});
-});
-
-kernel.on('trigger_close', function() {
-	close();
-});
+def populate_plugins():
+	os.chdir(os.path.dirname(os.path.abspath(__file__)))
+	for f in os.listdir('plugins'):
+		if f.endswith('.py') and not '__init__' in f and not f.startswith('_'):
+			load_plugin(f[:-3])
 '''
 
 
@@ -190,12 +109,12 @@ IPYTHON
   # same kernel simultaneously, so that frontends can label the various
   # messages in a meaningful way.
   'header' : {
-                'msg_id' : uuid,
-                'username' : str,
-                'session' : uuid,
-                # All recognized message type strings are listed below.
-                'msg_type' : str,
-     },
+				'msg_id' : uuid,
+				'username' : str,
+				'session' : uuid,
+				# All recognized message type strings are listed below.
+				'msg_type' : str,
+	 },
 
   # In a chain of messages, the header from the parent is copied so that
   # clients can track where messages come from.
@@ -208,18 +127,6 @@ IPYTHON
   # depends on the message type.
   'content' : dict,
 }
-
-
-{
-	'header': {
-		'username': User,
-		'type': 'input_request'
-	},
-	'content': {
-		'text': ...
-	}
-}
-
 '''
 
 
@@ -227,6 +134,70 @@ class Kernel:
 
 	def __init__(self):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
+		#populate_plugins()  # Find all plugins we know about
+		
+
+	def out(self, text):
+		self.direct_channel({
+			'header': {
+				'type': 'input_response'
+			},
+			'content': {
+				'text': text
+			}
+		})
+
+	def err(self, text):
+		self.direct_channel({
+			'header': {
+				'type': 'input_response'
+			},
+			'content': {
+				# @TODO: This should happen client-side!!!!
+				'text': '<span style="color:red;">{}</span>'.format(text)
+			}
+		})
+
+	def run_command(self, command, args):
+
+		# @TODO: Handle aliases? (preprocessing of input)
+
+		if command in builtins:
+			builtins[command](self, args)
+			return
+
+		
+
+		# If it's a plugin, run it
+		if hasattr(globals(), command):
+			getattr(globals(), command).run(self, args)
+			return
+
+		'''
+		# Attempt to pass the command off to the underlying OS
+		# @TODO: Error checking! (does command exist?)
+		try:
+			with directory(current_directory):
+				subprocess.call([command] + args)
+			return
+		except OSError:
+			pass
+
+		# Okay...we really don't know what to do
+		print('Unrecognized command "{}"'.format(command))
+
+
+		/** JS Version
+		 * 1. Is it a built-in function? (right in this class)
+		 * 2. Is it a script in plugins/ folder (recursive)?
+		 * 3. Is it a native shell command?
+		 * 4. Pass to semantic analyzer
+		 */
+
+		# @TODO:
+		# 2. Attempt to pass the command off to the underlying shell. If that succeeds, return.
+		# 3. Interpret command semantically. This could include conversationally, etc.
+		'''
 
 	'''
 	Each of the methods below handles a single type of message sent from a client.
@@ -237,22 +208,15 @@ class Kernel:
 	def input_request(self, message):
 		self.direct_channel(message)  # Broadcast entire original message to all clients
 
-		if not message['content']['text']:
+		uin = message['content']['text']
+		if not uin:
 			return
 
-		# raw_cmd = shlex.split(string)
-		# return self.runCommand(raw_cmd[0], raw_cmd[1:])
+		# @TODO: This should not happen here.
+		# If for example the user types "i'm doing fine" (note the quote) shlex will throw a ValueError
+		raw_cmd = shlex.split(uin)
 
-		self.direct_channel({
-			'header': {
-				'username': message['header']['username'],
-				'type': 'input_response'
-			},
-			'content': {
-				'text': message['content']['text']
-			}
-		})
-
+		self.run_command(raw_cmd[0], raw_cmd[1:])
 
 	def handshake_request(self, message):
 		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])  # Random 5-digit assigned username

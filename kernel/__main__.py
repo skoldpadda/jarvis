@@ -20,19 +20,16 @@ class IndexHandler(web.RequestHandler):
 		self.render('web/index.html')
 
 
-# @TODO: Robustify this, and do we even need [room] anymore?
+# @TODO: Robustify this
 # @NOTE: [message] can only be a STRING (per WebSocket protocol)
 class KernelConnection(SockJSConnection):
-
-	room = set()
 
 	def __init__(self, session):
 		super(KernelConnection, self).__init__(session)
 		kernel.direct_channel += self.from_kernel
 
 	def on_open(self, info):
-		# self.broadcast(self.room, 'Someone has joined.')
-		self.room.add(self)
+		pass
 
 	def on_message(self, message):
 		response = kernel.handle_input(json.loads(message))
@@ -40,8 +37,7 @@ class KernelConnection(SockJSConnection):
 			self.send(json.dumps(response))
 
 	def on_close(self):
-		self.room.remove(self)
-		# self.broadcast(self.room, 'Someone has left.')
+		pass
 
 	def from_kernel(self, message):
 		self.send(json.dumps(message))
