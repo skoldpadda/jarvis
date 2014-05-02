@@ -3,9 +3,7 @@ import shlex
 import uuid
 import datetime
 
-from tornado.template import Template
-
-from plugins import *
+import plugins
 
 
 '''
@@ -75,28 +73,6 @@ builtins = {
 }
 
 
-# A dictionary of plugins that Jarvis knows about
-
-'''
-plugins = {}
-
-def load_plugin(name):
-	try:
-		#plugin = __import__('plugins.{}'.format(name), fromlist=['plugins'])
-		plugin = __import__('kernel.plugins', fromlist=[name])
-	except ImportError, e:
-		print e
-		return None
-	plugins[name] = plugin
-	return plugin
-
-def populate_plugins():
-	os.chdir(os.path.dirname(os.path.abspath(__file__)))
-	for f in os.listdir('plugins'):
-		if f.endswith('.py') and not '__init__' in f and not f.startswith('_'):
-			load_plugin(f[:-3])
-'''
-
 
 
 '''
@@ -134,8 +110,6 @@ class Kernel:
 
 	def __init__(self):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
-		#populate_plugins()  # Find all plugins we know about
-		
 
 	def out(self, text):
 		self.direct_channel({
@@ -166,11 +140,10 @@ class Kernel:
 			builtins[command](self, args)
 			return
 
-		
-
 		# If it's a plugin, run it
-		if hasattr(globals(), command):
-			getattr(globals(), command).run(self, args)
+		plugin = plugins.get_plugin(command)
+		if plugin:
+			plugin.run(self, args)
 			return
 
 		'''

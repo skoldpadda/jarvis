@@ -1,4 +1,5 @@
 import webbrowser
 
-def run(args):
-    webbrowser.open('http://www.google.com')
+# @ TODO: URL/search support
+def run(shell, args):
+	webbrowser.open('http://www.google.com')

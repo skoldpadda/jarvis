@@ -18,7 +18,7 @@ Options:
 """
 from _docopt import docopt
 
-def run(args):
-    arguments = docopt(__doc__, argv=args, version='Naval Fate 2.0')
-    if arguments:
-        print(arguments)
+def run(shell, args):
+	arguments = docopt(__doc__, argv=args, version='Naval Fate 2.0')
+	if arguments:
+		shell.out(arguments)
