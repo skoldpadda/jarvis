@@ -92,7 +92,7 @@ function escapeHtml(string) {
 function printMessage(message) {
 	var content = document.getElementById('content');
 	if (message.hasOwnProperty('tag')) {
-		content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + " &gt; </span>";
+		content.innerHTML += '<span class="' + message.author + '">' + message.tag + ' &gt; </span>';
 	}
 	content.innerHTML += (message.text + "\n");  // @TODO: Need newline here?
 	content.parentNode.scrollTop = content.parentNode.scrollHeight;
@@ -152,9 +152,12 @@ var messageHandlers = {
 	},
 	input_response: function(data) {
 		console.log(data);
+		// @TODO: We actually shouldn't escape EVERYTHING.
+		// For example, suppose the response is a url with metadata saying it should be inserted as an img
+		// Or embedded video? What then?
 		var text = escapeHtml(data.content.text);
 		if (data.content.err !== undefined) {
-			text = '<span style="color:#c82829;">' + text + '</span>';
+			text = '<span class="error">' + text + '</span>';
 		}
 		printMessage({
 			'text': text
@@ -168,6 +171,7 @@ var messageHandlers = {
 		});
 	},
 	handshake_response: function(data) {
+		// @TODO: Really the USERNAME should also go in the titlebar so clients know who they are
 		USERNAME = data.header.username;
 	},
 	property_change: function(data) {

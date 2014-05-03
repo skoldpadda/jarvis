@@ -156,6 +156,11 @@ span.user {
     color: #4271ae;
 }
 
+span.error {
+    font-weight: bold;
+    color: #c82829;
+}
+
 span.app {
     font-weight: bold;
 }

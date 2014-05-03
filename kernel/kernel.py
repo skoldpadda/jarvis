@@ -86,6 +86,25 @@ def history(shell, args):
 def pwd(shell, args):
 	shell.out(shell.current_directory)
 
+def username(shell, args):
+	# @TODO: In order to do this...
+	#  - This function needs to know what user called it
+	#  - direct_channel() needs the ability to single out clients
+	#    so that only the caller's username gets affected
+	'''
+	user = args[0] if args else 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])
+	shell.direct_channel({
+		'header': {
+			'type': 'property_change'
+		},
+		'content': {
+			'property': 'username',
+			'value': user
+		}
+	})
+	'''
+	shell.out('You typed username')
+
 
 # A dictionary of commands in this file
 builtins = {
@@ -93,40 +112,8 @@ builtins = {
 	'help': help,
 	'history': history,
 	'pwd': pwd,
+	'username': username
 }
-
-
-
-
-'''
-IPYTHON
-{
-  # The message header contains a pair of unique identifiers for the
-  # originating session and the actual message id, in addition to the
-  # username for the process that generated the message.  This is useful in
-  # collaborative settings where multiple users may be interacting with the
-  # same kernel simultaneously, so that frontends can label the various
-  # messages in a meaningful way.
-  'header' : {
-				'msg_id' : uuid,
-				'username' : str,
-				'session' : uuid,
-				# All recognized message type strings are listed below.
-				'msg_type' : str,
-	 },
-
-  # In a chain of messages, the header from the parent is copied so that
-  # clients can track where messages come from.
-  'parent_header' : dict,
-
-  # Any metadata associated with the message.
-  'metadata' : dict,
-
-  # The actual content of the message must be a dict, whose structure
-  # depends on the message type.
-  'content' : dict,
-}
-'''
 
 
 class Kernel(object):
@@ -136,6 +123,33 @@ class Kernel(object):
 		self._current_directory = os.path.expanduser('~')
 
 
+	'''
+	The below methods encapsulate common messages sent to clients.
+	They should NOT be called from outside scripts.
+	'''
+
+	def _jarvis_message(self, text):
+		self.direct_channel({
+			'header': {
+				'type': 'jarvis_message'
+			},
+			'content': {
+				'text': text
+			}
+		})
+
+	def _property_change(self, key, value):
+		self.direct_channel({
+			'header': {
+				'type': 'property_change'
+			},
+			'content': {
+				'property': key,
+				'value': value
+			}
+		})
+
+
 	@property
 	def current_directory(self):
 		return self._current_directory
@@ -143,15 +157,7 @@ class Kernel(object):
 	@current_directory.setter
 	def current_directory(self, value):
 		self._current_directory = value
-		self.direct_channel({
-			'header': {
-				'type': 'property_change'
-			},
-			'content': {
-				'property': 'current_directory',
-				'value': self._current_directory
-			}
-		})
+		self._property_change('current_directory', self._current_directory)
 
 
 	def out(self, text):
@@ -179,19 +185,19 @@ class Kernel(object):
 
 		# @TODO: Handle aliases? (preprocessing of input)
 
+		# Is it a built-in function? (right in this file)
 		if command in builtins:
 			builtins[command](self, args)
 			return
 
-		# If it's a plugin, run it
+		# Is it a script in the plugins/ directory?
 		plugin = plugins.get_plugin(command)
 		if plugin:
 			plugin.run(self, args)
 			return
 
 		'''
-		# Attempt to pass the command off to the underlying OS
-		# @TODO: Error checking! (does command exist?)
+		# Is it a native shell command?
 		try:
 			with directory(current_directory):
 				subprocess.call([command] + args)
@@ -199,21 +205,12 @@ class Kernel(object):
 		except OSError:
 			pass
 
-		# Okay...we really don't know what to do
-		print('Unrecognized command "{}"'.format(command))
-
-
-		/** JS Version
-		 * 1. Is it a built-in function? (right in this class)
-		 * 2. Is it a script in plugins/ folder (recursive)?
-		 * 3. Is it a native shell command?
-		 * 4. Pass to semantic analyzer
-		 */
-
-		# @TODO:
-		# 2. Attempt to pass the command off to the underlying shell. If that succeeds, return.
-		# 3. Interpret command semantically. This could include conversationally, etc.
+		# Pass it to semantic analyzer (part of conversation, etc.)
 		'''
+
+		# Okay...we really don't know what to do
+		self.err('Unrecognized command "{}"'.format(command))
+
 
 	'''
 	Each of the methods below handles a single type of message sent from a client.
@@ -236,16 +233,10 @@ class Kernel(object):
 
 	def handshake_request(self, message):
 		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])  # Random 5-digit assigned username
-		self.direct_channel({
-			'header': {
-				'username': user,
-				'type': 'jarvis_message'
-			},
-			'content': {
-				'text': '{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-			}
-		})
+		self._jarvis_message('{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 		self.current_directory = self._current_directory  # Hack to broadcast the cd for new clients
+		# @TODO: Should be a property_change, not a handshake_response (since users can change username too)
+		# Usernames should be managed KERNEL-SIDE. The USERNAME var client-side is just a cache.
 		return {
 			'header': {
 				'username': user,
