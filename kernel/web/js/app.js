@@ -94,7 +94,7 @@ function printMessage(message) {
 	if (message.hasOwnProperty('tag')) {
 		content.innerHTML += "<span class=\"" + message.author + "\">" + message.tag + " &gt; </span>";
 	}
-	content.innerHTML += (escapeHtml(message.text) + "\n");  // @TODO: Need newline here?
+	content.innerHTML += (message.text + "\n");  // @TODO: Need newline here?
 	content.parentNode.scrollTop = content.parentNode.scrollHeight;
 }
 
@@ -147,23 +147,33 @@ var messageHandlers = {
 		printMessage({
 			'author': 'user',
 			'tag': data.header.username,
-			'text': data.content.text
+			'text': escapeHtml(data.content.text)
 		});
 	},
 	input_response: function(data) {
+		console.log(data);
+		var text = escapeHtml(data.content.text);
+		if (data.content.err !== undefined) {
+			text = '<span style="color:#c82829;">' + text + '</span>';
+		}
 		printMessage({
-			'text': data.content.text
+			'text': text
 		});
 	},
 	jarvis_message: function(data) {
 		printMessage({
 			'author': 'jarvis',
 			'tag': JARVIS.NAME,  // @TODO: Kernel-side
-			'text': data.content.text
+			'text': escapeHtml(data.content.text)
 		});
 	},
 	handshake_response: function(data) {
 		USERNAME = data.header.username;
+	},
+	property_change: function(data) {
+		if (data.content.property === 'current_directory') {
+			resetTitlebarText(data.content.value);
+		}
 	}
 };
 

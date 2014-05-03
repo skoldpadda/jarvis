@@ -23,7 +23,7 @@ import plugins
 # Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
 # @TODO: Ability to single out clients
 class Event:
-
+	'''Simple event bus that manages notifying a set of handlers'''
 	def __init__(self):
 		self.handlers = set()
 
@@ -48,6 +48,19 @@ class Event:
 	__len__  = get_handler_count
 
 
+class Directory:
+	'''Context manager for changing the current working directory'''
+	def __init__(self, new_path):
+		self.new_path = new_path
+
+	def __enter__(self):
+		self.saved_path = os.getcwd()
+		os.chdir(self.new_path)
+
+	def __exit__(self, etype, value, traceback):
+		os.chdir(self.saved_path)
+
+
 
 # https://github.com/willyg302/jarvis/blob/3e254dde64587b58c5fe9c8bcd335815dd3221b5/jarvis.py
 
@@ -56,7 +69,13 @@ class Event:
 
 # @TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
 def cd(shell, args):
-	shell.out('You typed cd')
+	path = args[0] if args else os.path.expanduser('~')
+	with Directory(shell.current_directory):
+		try:
+			os.chdir(path)
+			shell.current_directory = os.getcwd()
+		except OSError, e:
+			shell.err('{} is not a valid directory!'.format(path))
 
 def help(shell, args):
 	shell.out('You typed help')
@@ -64,12 +83,16 @@ def help(shell, args):
 def history(shell, args):
 	shell.out('You typed history')
 
+def pwd(shell, args):
+	shell.out(shell.current_directory)
+
 
 # A dictionary of commands in this file
 builtins = {
 	'cd': cd,
 	'help': help,
 	'history': history,
+	'pwd': pwd,
 }
 
 
@@ -106,10 +129,30 @@ IPYTHON
 '''
 
 
-class Kernel:
+class Kernel(object):
 
 	def __init__(self):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
+		self._current_directory = os.path.expanduser('~')
+
+
+	@property
+	def current_directory(self):
+		return self._current_directory
+	
+	@current_directory.setter
+	def current_directory(self, value):
+		self._current_directory = value
+		self.direct_channel({
+			'header': {
+				'type': 'property_change'
+			},
+			'content': {
+				'property': 'current_directory',
+				'value': self._current_directory
+			}
+		})
+
 
 	def out(self, text):
 		self.direct_channel({
@@ -127,8 +170,8 @@ class Kernel:
 				'type': 'input_response'
 			},
 			'content': {
-				# @TODO: This should happen client-side!!!!
-				'text': '<span style="color:red;">{}</span>'.format(text)
+				'text': text,
+				'err': True
 			}
 		})
 
@@ -202,6 +245,7 @@ class Kernel:
 				'text': '{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 			}
 		})
+		self.current_directory = self._current_directory  # Hack to broadcast the cd for new clients
 		return {
 			'header': {
 				'username': user,
