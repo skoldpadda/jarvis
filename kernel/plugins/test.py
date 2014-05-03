@@ -1,12 +1,12 @@
-"""Naval Fate.
+'''Docopt testing function.
 
 Usage:
-  naval_fate.py ship new <name>...
-  naval_fate.py ship <name> move <x> <y> [--speed=<kn>]
-  naval_fate.py ship shoot <x> <y>
-  naval_fate.py mine (set|remove) <x> <y> [--moored | --drifting]
-  naval_fate.py (-h | --help)
-  naval_fate.py --version
+  test ship new <name>...
+  test ship <name> move <x> <y> [--speed=<kn>]
+  test ship shoot <x> <y>
+  test mine (set|remove) <x> <y> [--moored | --drifting]
+  test (-h | --help)
+  test --version
 
 Options:
   -h --help     Show this screen.
@@ -14,11 +14,10 @@ Options:
   --speed=<kn>  Speed in knots [default: 10].
   --moored      Moored (anchored) mine.
   --drifting    Drifting mine.
-
-"""
+'''
 from _docopt import docopt
 
 def run(shell, args):
-	arguments = docopt(__doc__, argv=args, version='Naval Fate 2.0')
+	arguments = docopt(__doc__, argv=args, version='Test v2.0')
 	if arguments:
-		shell.out(arguments)
+		shell.out(str(arguments))

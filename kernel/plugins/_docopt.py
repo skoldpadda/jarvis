@@ -6,10 +6,10 @@
  * Copyright (c) 2013 Vladimir Keleshev, vladimir@keleshev.com
 
  Modified slightly by WillyG to allow embedding in a custom REPL
-
 """
 import sys
 import re
+import textwrap
 
 
 __all__ = ['docopt']
@@ -474,17 +474,13 @@ def formal_usage(section):
     pu = section.split()
     return '( ' + ' '.join(') | (' if s == pu[0] else s for s in pu[1:]) + ' )'
 
-# Returns true if an extra was handled
+# Returns None if no extra was handled
 def extras(help, version, options, doc):
     if help and any((o.name in ('-h', '--help')) and o.value for o in options):
-        print(doc.strip("\n"))
-        #sys.exit() @willyg: do not exit Python!
-        return True
+        return textwrap.dedent(doc.strip('\n'))
     if version and any(o.name == '--version' and o.value for o in options):
-        print(version)
-        #sys.exit() @willyg: do not exit Python!
-        return True
-    return False
+        return version
+    return None
 
 
 class Dict(dict):
@@ -579,13 +575,14 @@ def docopt(doc, argv=None, help=True, version=None, options_first=False):
         #if any_options:
         #    options_shortcut.children += [Option(o.short, o.long, o.argcount)
         #                    for o in argv if type(o) is Option]
-    if extras(help, version, argv, doc):
-        return None
+    extra = extras(help, version, argv, doc)
+    if extra:
+        return extra
     matched, left, collected = pattern.fix().match(argv)
     if matched and left == []:  # better error message if left?
         return Dict((a.name, a.value) for a in (pattern.flat() + collected))
     try: # @willyg this is so stupid but it works so hah
         raise DocoptExit()
     except DocoptExit, e:
-        print e
+        return e
     return None
