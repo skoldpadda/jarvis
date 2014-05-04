@@ -4,8 +4,6 @@ var JARVIS = window.JARVIS = {
 	DEBUG: true,
 };
 
-var USERNAME = 'User';  // @TODO allow this to be set (or force it on startup)
-
 
 var conn = null;
 var connOpen = false;
@@ -66,10 +64,6 @@ function refreshTheme() {
 	createButton('ctrlpanel', but, ctrlpanel);
 }
 
-function resetTitlebarText(text) {
-	document.getElementsByClassName('titlebar-text')[0].innerHTML = JARVIS.NAME + " - " + text;
-}
-
 
 /** MESSAGING **/
 
@@ -108,7 +102,6 @@ function sendToKernel(obj) {
 function userMessage(message) {
 	sendToKernel({
 		'header': {
-			'username': USERNAME,
 			'type': 'input_request'
 		},
 		'content': {
@@ -172,11 +165,11 @@ var messageHandlers = {
 	},
 	handshake_response: function(data) {
 		// @TODO: Really the USERNAME should also go in the titlebar so clients know who they are
-		USERNAME = data.header.username;
+		// USERNAME = data.header.username;
 	},
-	property_change: function(data) {
-		if (data.content.property === 'current_directory') {
-			resetTitlebarText(data.content.value);
+	property_update: function(data) {
+		if (data.content.property === 'current_directory' || data.content.property === 'username') {
+			document.getElementById(data.content.property).innerHTML = data.content.value;
 		}
 	}
 };
@@ -195,7 +188,6 @@ function initSockJS() {
 		connOpen = true;
 		sendToKernel({
 			'header': {
-				'username': USERNAME,
 				'type': 'handshake_request'
 			}
 		});
@@ -212,7 +204,7 @@ function initSockJS() {
 
 window.onload = function() {
 	refreshTheme();
-	resetTitlebarText('');  // @TODO: this (gets updated by kernel upon handshake)
+	document.getElementsByClassName('titlebar-text')[0].innerHTML = '<span id="username"></span> - <span id="current_directory"></span>';
 	document.getElementById('inputbar').onkeypress = onInputBarKeypress;
 	document.getElementById('inputbar').focus();
 

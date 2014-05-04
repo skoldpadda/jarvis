@@ -1,6 +1,5 @@
 import os
 import shlex
-import uuid
 import datetime
 
 import plugins
@@ -21,23 +20,23 @@ import plugins
 
 
 # Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
-# @TODO: Ability to single out clients
 class Event:
 	'''Simple event bus that manages notifying a set of handlers'''
 	def __init__(self):
-		self.handlers = set()
+		self.handlers = {}
 
-	def handle(self, handler):
-		self.handlers.add(handler)
+	def handle(self, handler_tuple):
+		self.handlers[handler_tuple[0]] = handler_tuple[1]
 		return self
 
-	def unhandle(self, handler):
-		self.handlers.discard(handler)
+	def unhandle(self, handler_id):
+		self.handlers.pop(handler_id, None)
 		return self
 
-	def fire(self, *args, **kwargs):
-		for handler in self.handlers:
-			handler(*args, **kwargs)
+	def fire(self, message, recipients=None):
+		send_to = {k: v for k, v in self.handlers.iteritems() if k in recipients} if recipients else self.handlers
+		for handler in send_to.itervalues():
+			handler(message)
 
 	def get_handler_count(self):
 		return len(self.handlers)
@@ -61,13 +60,7 @@ class Directory:
 		os.chdir(self.saved_path)
 
 
-
-# https://github.com/willyg302/jarvis/blob/3e254dde64587b58c5fe9c8bcd335815dd3221b5/jarvis.py
-
-
-
-
-# @TODO: Error-checking! Does directory exist? spaces in directory name? if user just types "cd", go back to home!
+# @TODO: Error-checking! Does directory exist? spaces in directory name?
 def cd(shell, args):
 	path = args[0] if args else os.path.expanduser('~')
 	with Directory(shell.current_directory):
@@ -86,24 +79,13 @@ def history(shell, args):
 def pwd(shell, args):
 	shell.out(shell.current_directory)
 
+# @TODO: This is ABSOLUTELY HORRIBLE. Commands should have context, not the shell (_clients is a hack)
 def username(shell, args):
-	# @TODO: In order to do this...
-	#  - This function needs to know what user called it
-	#  - direct_channel() needs the ability to single out clients
-	#    so that only the caller's username gets affected
-	'''
-	user = args[0] if args else 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])
-	shell.direct_channel({
-		'header': {
-			'type': 'property_change'
-		},
-		'content': {
-			'property': 'username',
-			'value': user
-		}
-	})
-	'''
-	shell.out('You typed username')
+	if args:
+		shell._clients[shell._caller] = args[0]
+		shell._property_update('username', args[0], [shell._caller])
+	else:
+		shell.out(shell._clients[shell._caller])
 
 
 # A dictionary of commands in this file
@@ -122,6 +104,8 @@ class Kernel(object):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
 		self._current_directory = os.path.expanduser('~')
 
+		self._clients = {}
+
 
 	'''
 	The below methods encapsulate common messages sent to clients.
@@ -138,16 +122,16 @@ class Kernel(object):
 			}
 		})
 
-	def _property_change(self, key, value):
+	def _property_update(self, key, value, recipients=None):
 		self.direct_channel({
 			'header': {
-				'type': 'property_change'
+				'type': 'property_update'
 			},
 			'content': {
 				'property': key,
 				'value': value
 			}
-		})
+		}, recipients)
 
 
 	@property
@@ -157,7 +141,7 @@ class Kernel(object):
 	@current_directory.setter
 	def current_directory(self, value):
 		self._current_directory = value
-		self._property_change('current_directory', self._current_directory)
+		self._property_update('current_directory', self._current_directory)
 
 
 	def out(self, text):
@@ -219,6 +203,9 @@ class Kernel(object):
 	'''
 
 	def input_request(self, message):
+		caller = message['header']['uid']
+		self._caller = caller
+		message['header']['username'] = self._clients[caller]
 		self.direct_channel(message)  # Broadcast entire original message to all clients
 
 		uin = message['content']['text']
@@ -232,11 +219,10 @@ class Kernel(object):
 		self.run_command(raw_cmd[0], raw_cmd[1:])
 
 	def handshake_request(self, message):
-		user = 'user-{}'.format(str(uuid.uuid4().fields[0])[:5])  # Random 5-digit assigned username
+		user = self._clients[message['header']['uid']]
 		self._jarvis_message('{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 		self.current_directory = self._current_directory  # Hack to broadcast the cd for new clients
-		# @TODO: Should be a property_change, not a handshake_response (since users can change username too)
-		# Usernames should be managed KERNEL-SIDE. The USERNAME var client-side is just a cache.
+		self._property_update('username', user, [message['header']['uid']])
 		return {
 			'header': {
 				'username': user,
@@ -252,3 +238,7 @@ class Kernel(object):
 			return getattr(c, msg_type)(self, message)
 
 		# @TODO should return error (invalid message type)
+
+
+	def connection_open(self, uid):
+		self._clients[uid] = 'user-{}'.format(uid[:5])

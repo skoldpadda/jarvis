@@ -1,6 +1,7 @@
 import os
 import json
 import signal
+import uuid
 
 from tornado import ioloop, web
 from sockjs.tornado import SockJSConnection, SockJSRouter
@@ -26,13 +27,16 @@ class KernelConnection(SockJSConnection):
 
 	def __init__(self, session):
 		super(KernelConnection, self).__init__(session)
-		kernel.direct_channel += self.from_kernel
+		self._id = str(uuid.uuid4())
+		kernel.direct_channel += (self._id, self.from_kernel)
 
 	def on_open(self, info):
-		pass
+		kernel.connection_open(self._id)
 
 	def on_message(self, message):
-		response = kernel.handle_input(json.loads(message))
+		obj = json.loads(message)
+		obj['header']['uid'] = self._id
+		response = kernel.handle_input(obj)
 		if response:
 			self.send(json.dumps(response))
 
