@@ -10,8 +10,7 @@
   },
   "scripts": {
     "app": "nodewebkit jarvis-nw",
-    "deploy": "grunt",
-    "prepublish": "node prepublish.js"
+    "deploy": "grunt"
   },
   "dependencies": {
     "grunt": "~0.4.2",

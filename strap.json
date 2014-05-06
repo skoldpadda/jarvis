@@ -6,6 +6,13 @@
 			"virtualenv": "env",
 			"requirements": ["pip install sockjs-tornado"],
 			"freeze": "requirements.txt"
+		},
+		{
+			"requirements": ["npm install"]
+		},
+		{
+			"root": "jarvis-nw",
+			"requirements": ["npm install"]
 		}
 	]
 }
