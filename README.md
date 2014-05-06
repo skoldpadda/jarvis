@@ -18,12 +18,12 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
 
 3. Get [Python](http://www.python.org/) (we use 2.7)
 
-4. Install [init-skeleton](https://github.com/paulmillr/init-skeleton): `npm install -g init-skeleton`
+4. Install [strap.py](https://github.com/willyg302/strap.py)
 
 5. Grab jarvis!
 
    ```
-   init-skeleton gh:willyg302/jarvis jarvis
+   strap gh:willyg302/jarvis jarvis
    ```
 
 ### Running
