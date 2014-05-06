@@ -1,0 +1,11 @@
+{
+	"project": "jarvis Kernel",
+	"tasks": [
+		{
+			"root": "kernel",
+			"virtualenv": "env",
+			"requirements": ["pip install sockjs-tornado"],
+			"freeze": "requirements.txt"
+		}
+	]
+}
