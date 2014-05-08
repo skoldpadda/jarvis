@@ -2,3 +2,4 @@ DEPRECATED/
 node_modules/
 jarvis-nw/node_modules/
 dist/
+*.py[cod]
