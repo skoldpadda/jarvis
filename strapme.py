@@ -17,11 +17,16 @@ config = {
 			'root': 'jarvis-nw',
 			'run': ['npm install']
 		},
+		'kernel': {
+			'name': 'Launch Kernel',
+			'virtualenv': 'kernel/env',
+			'run': ['python kernel']
+		},
 		'install': {
 			'run': ['install_kernel', 'npm_root', 'npm_nw']
 		},
 		'default': {
-			'run': ['install']
+			'run': ['kernel']
 		}
 	}
 }

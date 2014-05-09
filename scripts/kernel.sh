@@ -1,1 +1,0 @@
-kernel/env/bin/python kernel

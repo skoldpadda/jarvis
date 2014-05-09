@@ -1,1 +1,0 @@
-kernel\env\Scripts\python kernel

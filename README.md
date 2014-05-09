@@ -31,8 +31,8 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
 Made it this far? Awesome. Now run that bad boy.
 
 ```bash
-scripts\kernel.bat    # Windows
-sh scripts/kernel.sh  # Mac/Linux
+cd jarvis
+strap
 ```
 
 At this point you can visit `localhost:8080` to see an in-browser reference implementation of the jarvis frontend. If you want to run the standalone node-webkit based frontend, just do `npm run app` after starting the kernel.
