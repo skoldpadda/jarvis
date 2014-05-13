@@ -2,10 +2,8 @@ import os
 import shlex
 import datetime
 
-import urllib
-import urllib2
-
 import plugins
+from brain import brain
 
 
 '''
@@ -175,13 +173,13 @@ class Kernel(object):
 		# Is it a built-in function? (right in this file)
 		if command in builtins:
 			builtins[command](self, args)
-			return
+			return True
 
 		# Is it a script in the plugins/ directory?
 		plugin = plugins.get_plugin(command)
 		if plugin:
 			plugin.run(self, args)
-			return
+			return True
 
 		'''
 		# Is it a native shell command?
@@ -191,25 +189,10 @@ class Kernel(object):
 			return
 		except OSError:
 			pass
-
-		# Pass it to semantic analyzer (part of conversation, etc.)
 		'''
 
-		# @TODO: This is SO CHEAP. Just for kicks (for now)
-		# Also, can use simple/json to get SOURCE and optionally IMAGES to display.
-		# For example on long responses that are truncated, can add a "More" link.
-		req = urllib2.Request('https://weannie.pannous.com/api', urllib.urlencode({
-			'out': 'simple',
-			'input': ' '.join([command] + args)
-		}))
-		response = urllib2.urlopen(req).read()
-		if len(response) > 250:
-			response = response[:250] + "..."
-		self.out(response)
-		return
-
-		# Okay...we really don't know what to do
-		self.err('Unrecognized command "{}"'.format(command))
+		# Probably not a command, pass it to brain
+		return False
 
 
 	'''
@@ -228,11 +211,20 @@ class Kernel(object):
 		if not uin:
 			return
 
-		# @TODO: This should not happen here.
-		# If for example the user types "i'm doing fine" (note the quote) shlex will throw a ValueError
-		raw_cmd = shlex.split(uin)
+		try:
+			raw_cmd = shlex.split(uin)
+			if self.run_command(raw_cmd[0], raw_cmd[1:]):
+				return
+		except ValueError:
+			pass
 
-		self.run_command(raw_cmd[0], raw_cmd[1:])
+		response = brain.receive(uin)
+		if response:
+			self.out(response)
+			return
+
+		# Okay...we really don't know what to do
+		self.err('Sorry, I do not understand')
 
 	def handshake_request(self, message):
 		user = self._clients[message['header']['uid']]
