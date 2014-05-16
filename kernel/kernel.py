@@ -3,6 +3,7 @@ import shlex
 import datetime
 
 import plugins
+from plugins._docopt import docopt
 from brain import brain
 
 
@@ -99,6 +100,10 @@ builtins = {
 }
 
 
+class ShellException(Exception):
+	pass
+
+
 class Kernel(object):
 
 	def __init__(self):
@@ -166,6 +171,9 @@ class Kernel(object):
 			}
 		})
 
+	def throw(self, text):
+		raise ShellException(text)
+
 	def run_command(self, command, args):
 
 		# @TODO: Handle aliases? (preprocessing of input)
@@ -178,8 +186,17 @@ class Kernel(object):
 		# Is it a script in the plugins/ directory?
 		plugin = plugins.get_plugin(command)
 		if plugin:
-			plugin.run(self, args)
+			try:
+				parsed_args = docopt(plugin.__doc__, argv=args, version=plugin.__version__ if hasattr(plugin, '__version__') else 'No version provided')
+				if isinstance(parsed_args, dict):
+					plugin.run(self, parsed_args)
+				else:
+					self.out(str(parsed_args))
+			except ShellException, e:
+				self.err(str(e))
 			return True
+
+
 
 		'''
 		# Is it a native shell command?

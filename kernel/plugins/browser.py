@@ -1,3 +1,8 @@
+'''Open a browser, optionally to a specified URL or search query.
+
+Usage:
+  browser [<url>...]
+'''
 import webbrowser
 import urllib
 
@@ -18,7 +23,7 @@ def is_valid_url(url):
 	return url is not None and regex.search(url)
 
 def run(shell, args):
-	url = args[0] if args else 'https://www.google.com/'
+	url = ' '.join(args['<url>']) if args['<url>'] else 'https://www.google.com/'
 	if not is_valid_url(url):
 		url = 'https://www.google.com/#q={}'.format(urllib.quote(url, ''))
 	webbrowser.open(url)

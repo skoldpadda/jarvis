@@ -15,9 +15,6 @@ Options:
   --moored      Moored (anchored) mine.
   --drifting    Drifting mine.
 '''
-from _docopt import docopt
 
 def run(shell, args):
-	arguments = docopt(__doc__, argv=args, version='Test v2.0')
-	if arguments:
-		shell.out(str(arguments))
+	shell.out(str(args))
