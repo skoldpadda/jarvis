@@ -2,6 +2,7 @@ import os
 import shlex
 import datetime
 
+import builtins
 import plugins
 from plugins._docopt import docopt
 from brain import brain
@@ -60,44 +61,6 @@ class Directory:
 
 	def __exit__(self, etype, value, traceback):
 		os.chdir(self.saved_path)
-
-
-# @TODO: Error-checking! Does directory exist? spaces in directory name?
-def cd(shell, args):
-	path = args[0] if args else os.path.expanduser('~')
-	with Directory(shell.current_directory):
-		try:
-			os.chdir(path)
-			shell.current_directory = os.getcwd()
-		except OSError, e:
-			shell.err('{} is not a valid directory!'.format(path))
-
-def help(shell, args):
-	shell.out('You typed help')
-
-def history(shell, args):
-	shell.out('You typed history')
-
-def pwd(shell, args):
-	shell.out(shell.current_directory)
-
-# @TODO: This is ABSOLUTELY HORRIBLE. Commands should have context, not the shell (_clients is a hack)
-def username(shell, args):
-	if args:
-		shell._clients[shell._caller] = args[0]
-		shell._property_update('username', args[0], [shell._caller])
-	else:
-		shell.out(shell._clients[shell._caller])
-
-
-# A dictionary of commands in this file
-builtins = {
-	'cd': cd,
-	'help': help,
-	'history': history,
-	'pwd': pwd,
-	'username': username
-}
 
 
 class ShellException(Exception):
@@ -178,9 +141,14 @@ class Kernel(object):
 
 		# @TODO: Handle aliases? (preprocessing of input)
 
-		# Is it a built-in function? (right in this file)
-		if command in builtins:
-			builtins[command](self, args)
+		# Is it a built-in function?
+		if hasattr(builtins, command):
+			f = getattr(builtins, command)
+			parsed_args = docopt(f.__doc__, argv=args)
+			if isinstance(parsed_args, dict):
+				f(self, parsed_args)
+			else:
+				self.out(str(parsed_args))
 			return True
 
 		# Is it a script in the plugins/ directory?

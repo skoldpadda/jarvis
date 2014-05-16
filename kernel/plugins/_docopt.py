@@ -474,10 +474,13 @@ def formal_usage(section):
     pu = section.split()
     return '( ' + ' '.join(') | (' if s == pu[0] else s for s in pu[1:]) + ' )'
 
+def get_help(doc):
+    return textwrap.dedent(doc.strip('\n'))
+
 # Returns None if no extra was handled
 def extras(help, version, options, doc):
     if help and any((o.name in ('-h', '--help')) and o.value for o in options):
-        return textwrap.dedent(doc.strip('\n'))
+        return get_help(doc)
     if version and any(o.name == '--version' and o.value for o in options):
         return version
     return None
