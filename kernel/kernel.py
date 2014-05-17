@@ -4,6 +4,8 @@ import datetime
 
 import builtins
 import plugins
+
+from utils import Event
 from plugins._docopt import docopt
 from brain import brain
 
@@ -20,47 +22,6 @@ from brain import brain
    buffered until the previous command finishes. MAYBE THAT'S A GOOD THING?
    Do we want users to interleave commands, or wait until each is done?
 '''
-
-
-# Adapted from: http://www.valuedlessons.com/2008/04/events-in-python.html
-class Event:
-	'''Simple event bus that manages notifying a set of handlers'''
-	def __init__(self):
-		self.handlers = {}
-
-	def handle(self, handler_tuple):
-		self.handlers[handler_tuple[0]] = handler_tuple[1]
-		return self
-
-	def unhandle(self, handler_id):
-		self.handlers.pop(handler_id, None)
-		return self
-
-	def fire(self, message, recipients=None):
-		send_to = {k: v for k, v in self.handlers.iteritems() if k in recipients} if recipients else self.handlers
-		for handler in send_to.itervalues():
-			handler(message)
-
-	def get_handler_count(self):
-		return len(self.handlers)
-
-	__iadd__ = handle
-	__isub__ = unhandle
-	__call__ = fire
-	__len__  = get_handler_count
-
-
-class Directory:
-	'''Context manager for changing the current working directory'''
-	def __init__(self, new_path):
-		self.new_path = new_path
-
-	def __enter__(self):
-		self.saved_path = os.getcwd()
-		os.chdir(self.new_path)
-
-	def __exit__(self, etype, value, traceback):
-		os.chdir(self.saved_path)
 
 
 class ShellException(Exception):
@@ -137,6 +98,14 @@ class Kernel(object):
 	def throw(self, text):
 		raise ShellException(text)
 
+	def parse_command(self, f, docopt_args):
+		parsed_args = docopt(**docopt_args)
+		if isinstance(parsed_args, dict):
+			f(self, parsed_args)
+		else:
+			self.out(str(parsed_args))
+
+
 	def run_command(self, command, args):
 
 		# @TODO: Handle aliases? (preprocessing of input)
@@ -144,22 +113,21 @@ class Kernel(object):
 		# Is it a built-in function?
 		if hasattr(builtins, command):
 			f = getattr(builtins, command)
-			parsed_args = docopt(f.__doc__, argv=args)
-			if isinstance(parsed_args, dict):
-				f(self, parsed_args)
-			else:
-				self.out(str(parsed_args))
+			self.parse_command(f, {
+				'doc': f.__doc__,
+				'argv': args
+			})
 			return True
 
 		# Is it a script in the plugins/ directory?
 		plugin = plugins.get_plugin(command)
 		if plugin:
 			try:
-				parsed_args = docopt(plugin.__doc__, argv=args, version=plugin.__version__ if hasattr(plugin, '__version__') else 'No version provided')
-				if isinstance(parsed_args, dict):
-					plugin.run(self, parsed_args)
-				else:
-					self.out(str(parsed_args))
+				self.parse_command(plugin.run, {
+					'doc': plugin.__doc__,
+					'argv': args,
+					'version': plugin.__version__ if hasattr(plugin, '__version__') else 'No version provided'
+				})
 			except ShellException, e:
 				self.err(str(e))
 			return True

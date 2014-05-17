@@ -2,7 +2,9 @@ import os
 
 import plugins
 
+from utils import directory
 from plugins._docopt import get_help
+
 
 # @TODO: Error-checking! Does directory exist? spaces in directory name?
 def cd(shell, args):
@@ -12,8 +14,7 @@ Usage:
   cd [<dir>]
 '''
 	path = args['<dir>'] if args['<dir>'] else os.path.expanduser('~')
-	from kernel import Directory
-	with Directory(shell.current_directory):
+	with directory(shell.current_directory):
 		try:
 			os.chdir(path)
 			shell.current_directory = os.getcwd()
