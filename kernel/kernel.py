@@ -5,8 +5,9 @@ import datetime
 import builtins
 import plugins
 
-from utils import Event
-from plugins._docopt import docopt
+from utils.utils import Event
+from utils.docopt import docopt
+from utils.reactive import _
 from brain import brain
 
 
@@ -31,9 +32,26 @@ class ShellException(Exception):
 class Kernel(object):
 
 	def __init__(self):
-		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE})
-		self._current_directory = os.path.expanduser('~')
+		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE}, [optional list of recipients])
 
+'''
+		self.context = {
+			'cwd': os.path.expanduser('~'),
+			'clients': {}
+		}
+
+
+		def foo(trace, *args, **kwargs):
+			print('Trace ' + str(trace))
+
+		self.context = _({'content': {}})
+		self.context.onchange(foo, args=(), kwargs={})
+		self.context['cwd'] = os.path.expanduser('~')
+		self.context['content'] = {'a': 1}
+
+'''
+
+		self._current_directory = os.path.expanduser('~')
 		self._clients = {}
 
 
@@ -42,15 +60,17 @@ class Kernel(object):
 	They should NOT be called from outside scripts.
 	'''
 
-	def _jarvis_message(self, text):
-		self.direct_channel({
+	def _direct_message(self, type, content, recipients=None):
+		message = {
 			'header': {
-				'type': 'jarvis_message'
+				'type': type
 			},
-			'content': {
-				'text': text
-			}
-		})
+			'content': content
+		}
+		self.direct_channel(message, recipients)
+
+	def _jarvis_message(self, text):
+		self._direct_message('jarvis_message', {'text': text})
 
 	def _property_update(self, key, value, recipients=None):
 		self.direct_channel({

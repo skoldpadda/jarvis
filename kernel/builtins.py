@@ -2,8 +2,8 @@ import os
 
 import plugins
 
-from utils import directory
-from plugins._docopt import get_help
+from utils.utils import directory
+from utils.docopt import get_help
 
 
 # @TODO: Error-checking! Does directory exist? spaces in directory name?
