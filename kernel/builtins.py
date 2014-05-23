@@ -14,10 +14,10 @@ Usage:
   cd [<dir>]
 '''
 	path = args['<dir>'] if args['<dir>'] else os.path.expanduser('~')
-	with directory(shell.current_directory):
+	with directory(shell.context['cwd']):
 		try:
 			os.chdir(path)
-			shell.current_directory = os.getcwd()
+			shell.context['cwd'] = os.getcwd()
 		except OSError, e:
 			shell.err('{} is not a valid directory!'.format(path))
 
@@ -50,10 +50,10 @@ def pwd(shell, args):
 Usage:
   pwd
 '''
-	shell.out(shell.current_directory)
+	shell.out(shell.context['cwd'])
 
 
-# @TODO: This is ABSOLUTELY HORRIBLE. Commands should have context, not the shell (_clients is a hack)
+# @TODO: This is ABSOLUTELY HORRIBLE. Commands should have context, not the shell (_caller is a hack)
 def username(shell, args):
 	'''Display or change the current username.
 
@@ -61,7 +61,7 @@ Usage:
   username [<new>]
 '''
 	if args['<new>']:
-		shell._clients[shell._caller] = args['<new>']
+		shell.context['clients'][shell._caller] = args['<new>']
 		shell._property_update('username', args['<new>'], [shell._caller])
 	else:
-		shell.out(shell._clients[shell._caller])
+		shell.out(shell.context['clients'][shell._caller])

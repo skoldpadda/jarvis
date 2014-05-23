@@ -7,7 +7,7 @@ import plugins
 
 from utils.utils import Event
 from utils.docopt import docopt
-from utils.reactive import _
+from utils.supers import *
 from brain import brain
 
 
@@ -34,25 +34,14 @@ class Kernel(object):
 	def __init__(self):
 		self.direct_channel = Event()  # Call with: self.direct_channel({SOME JSON HERE}, [optional list of recipients])
 
-'''
-		self.context = {
+		self.context = watch({
 			'cwd': os.path.expanduser('~'),
 			'clients': {}
-		}
+		}, self.context_change)
 
-
-		def foo(trace, *args, **kwargs):
-			print('Trace ' + str(trace))
-
-		self.context = _({'content': {}})
-		self.context.onchange(foo, args=(), kwargs={})
-		self.context['cwd'] = os.path.expanduser('~')
-		self.context['content'] = {'a': 1}
-
-'''
-
-		self._current_directory = os.path.expanduser('~')
-		self._clients = {}
+	def context_change(self, record):
+		if record['name'] == 'cwd':
+			self._property_update('current_directory', self.context['cwd'])
 
 
 	'''
@@ -82,17 +71,6 @@ class Kernel(object):
 				'value': value
 			}
 		}, recipients)
-
-
-	@property
-	def current_directory(self):
-		return self._current_directory
-	
-	@current_directory.setter
-	def current_directory(self, value):
-		self._current_directory = value
-		self._property_update('current_directory', self._current_directory)
-
 
 	def out(self, text):
 		self.direct_channel({
@@ -177,7 +155,7 @@ class Kernel(object):
 	def input_request(self, message):
 		caller = message['header']['uid']
 		self._caller = caller
-		message['header']['username'] = self._clients[caller]
+		message['header']['username'] = self.context['clients'][caller]
 		self.direct_channel(message)  # Broadcast entire original message to all clients
 
 		uin = message['content']['text']
@@ -200,9 +178,9 @@ class Kernel(object):
 		self.err('Sorry, I do not understand')
 
 	def handshake_request(self, message):
-		user = self._clients[message['header']['uid']]
+		user = self.context['clients'][message['header']['uid']]
 		self._jarvis_message('{} joining on {}'.format(user, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-		self.current_directory = self._current_directory  # Hack to broadcast the cd for new clients
+		self.context['cwd'] = self.context['cwd']  # Hack to broadcast the cd for new clients
 		self._property_update('username', user, [message['header']['uid']])
 		return {
 			'header': {
@@ -222,4 +200,4 @@ class Kernel(object):
 
 
 	def connection_open(self, uid):
-		self._clients[uid] = 'user-{}'.format(uid[:5])
+		self.context['clients'][uid] = 'user-{}'.format(uid[:5])
