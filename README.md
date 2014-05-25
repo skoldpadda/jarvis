@@ -55,6 +55,8 @@ For more about the project's goals and design, see the [spec](spec.md).
 
 Besides everything marked [`@TODO`](https://github.com/willyg302/jarvis/search?q=%22%40TODO%22) in any source file.
 
+- [ ] "clip.py" -- better CLI parser, perhaps a mix of docopt and click
+- [ ] Data persistence via rudimentary "brain", a la Hubot
 - [ ] Provide methods for running built-in shell commands, possibly via [shell.js](https://github.com/arturadib/shelljs)
 - [ ] Settings file (akin to bash profiles) -- also manageable through Control Panel?
 - [ ] Establish reliable, extensible kernel/client protocol
