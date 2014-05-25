@@ -69,6 +69,8 @@ theme.resetCSS = function(document) {
         'color': this.color('orange')
     }).inject('span.user', {
         'color': this.color('blue')
+    }).inject('span.error', {
+        'color': this.color('red')
     }).inject('::-webkit-scrollbar-track', {
         'background-color': this.color('titlebar'),
         'border-left': "1px solid " + this.color(5)

@@ -113,12 +113,23 @@ function refreshTheme(name) {
     theme_manager.resetCSS(document);
 }
 
-function resetTitlebarText(text) {
-    document.getElementsByClassName('titlebar-text')[0].innerHTML = JARVIS.NAME + " - " + text;
-}
-
 
 /** MESSAGING **/
+
+var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return entityMap[s];
+    });
+}
 
 function printMessage(message) {
     var content = document.getElementById('content');
@@ -138,9 +149,12 @@ function sendToKernel(obj) {
 
 function userMessage(message) {
     sendToKernel({
-        'author': 'user',
-        'tag': utils.getUserName(),
-        'text': message
+        'header': {
+            'type': 'input_request'
+        },
+        'content': {
+            'text': message
+        }
     });
 }
 
@@ -166,6 +180,52 @@ function onInputBarKeypress(e) {
 }
 
 
+/** MESSAGE HANDLERS **/
+
+var messageHandlers = {
+    input_request: function(data) {
+        printMessage({
+            'author': 'user',
+            'tag': data.header.username,
+            'text': escapeHtml(data.content.text)
+        });
+    },
+    input_response: function(data) {
+        console.log(data);
+        // @TODO: We actually shouldn't escape EVERYTHING.
+        // For example, suppose the response is a url with metadata saying it should be inserted as an img
+        // Or embedded video? What then?
+        var text = escapeHtml(data.content.text);
+        if (data.content.err !== undefined) {
+            text = '<span class="error">' + text + '</span>';
+        }
+        printMessage({
+            'text': text
+        });
+    },
+    jarvis_message: function(data) {
+        printMessage({
+            'author': 'jarvis',
+            'tag': JARVIS.NAME,  // @TODO: Kernel-side
+            'text': escapeHtml(data.content.text)
+        });
+    },
+    handshake_response: function(data) {
+        // @TODO: Really the USERNAME should also go in the titlebar so clients know who they are
+        // USERNAME = data.header.username;
+    },
+    property_update: function(data) {
+        if (data.content.property === 'current_directory' || data.content.property === 'username') {
+            document.getElementById(data.content.property).innerHTML = data.content.value;
+        }
+    }
+};
+
+function handleKernelMessage(data) {
+    messageHandlers[data.header.type](data);
+}
+
+
 /** INITIALIZATION **/
 
 // Load settings and user folder, if it doesn't exist make it.
@@ -181,10 +241,15 @@ function initSockJS() {
     conn = new SockJS('http://localhost:8080/kernel');
     conn.onopen = function() {
         connOpen = true;
+        sendToKernel({
+            'header': {
+                'type': 'handshake_request'
+            }
+        });
     };
     conn.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        printMessage(data);
+        handleKernelMessage(data);
     };
     conn.onclose = function() {
         conn = null;
@@ -196,7 +261,7 @@ window.onload = function() {
     checkSettings();
     var settings = utils.userRequire('settings.js');  // @NOTE: Cannot userRequire() until AFTER checkSettings()!
     refreshTheme(settings.theme);
-    resetTitlebarText(utils.getUserHome());
+    document.getElementsByClassName('titlebar-text')[0].innerHTML = '<span id="username"></span> - <span id="current_directory"></span>';
     document.getElementById('inputbar').onkeypress = onInputBarKeypress;
     JARVIS.win.show();
     document.getElementById('inputbar').focus();

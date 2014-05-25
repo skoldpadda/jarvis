@@ -44,12 +44,6 @@ However, upon looking at TermKit's code I was slightly disappointed. A lot of th
 
 Used mostly for the crucial `copySync()` function, which emulates `cp -r` and allows us to copy the user folder out of the shell on first run. Also has a lot of other functions that may be useful.
 
-### [nedb](https://github.com/louischatriot/nedb)
-
-> **Status**: Included
-
-Not currently in use, but is recommended by and has support for node-webkit. It is also pseudo-MongoDB, which will prove useful later.
-
 ### CoffeeScript
 
 > **Status**: Undecided

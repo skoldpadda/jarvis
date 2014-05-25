@@ -148,6 +148,10 @@ span.user {
     font-weight: bold;
 }
 
+span.error {
+    font-weight: bold;
+}
+
 span.app {
     font-weight: bold;
 }

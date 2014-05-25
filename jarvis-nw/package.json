@@ -17,7 +17,6 @@
     "min_height": 240
   },
   "dependencies": {
-    "fs-extra": "~0.8.1",
-    "nedb": "~0.10.3"
+    "fs-extra": "~0.8.1"
   }
 }
