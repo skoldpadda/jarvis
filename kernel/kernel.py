@@ -5,9 +5,9 @@ import datetime
 import builtins
 import plugins
 
-from utils.utils import Event
-from utils.docopt import docopt
-from utils.supers import *
+from lib.utils import Event
+from lib.docopt import docopt
+from lib.supers import *
 from brain import brain
 
 

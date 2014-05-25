@@ -1,0 +1,8 @@
+# Ignore everything...
+*
+
+# ...except for these files
+!.gitignore
+!echo.py
+!jpm.py
+!sleep.py
