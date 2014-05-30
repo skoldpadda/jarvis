@@ -23,7 +23,7 @@ jarvis is for me, not you (at least at the moment). If you have somehow stumbled
 5. Grab jarvis!
 
    ```
-   strap gh:willyg302/jarvis jarvis
+   strap init gh:willyg302/jarvis -d jarvis
    ```
 
 ### Running
