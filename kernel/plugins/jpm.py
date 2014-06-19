@@ -1,11 +1,7 @@
-'''The jarvis plugin manager.
-
-Usage:
-  jpm <string>...
-'''
+'''The jarvis plugin manager.'''
 __version__ = '1.0'
 
-def run(shell, args):
+def _run(args):
 	# @TODO: Everything
 	shell.out(str(args))
 

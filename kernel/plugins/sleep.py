@@ -1,15 +1,13 @@
 '''Delay for a specified time, pause for an amount of time specified by the
-sum of the values of the command line arguments.
-
-Usage:
-  sleep <time>...
-'''
+sum of the values of the command line arguments.'''
 import time
 
-def run(shell, args):
-	try:
-		durations = [float(duration) for duration in args['<time>']]
-	except ValueError:
-		shell.throw('Durations must be a number')
-	time.sleep(sum(durations))
-	shell.out('sleep complete')
+def _run(args):
+
+	@cli.cmd
+	@cli.cmd_arg('duration', type=float, nargs='+')
+	def sleep(duration):
+		time.sleep(sum(duration))
+		shell.out('sleep complete')
+
+	cli.run(args, main=sleep)

@@ -1,4 +1,5 @@
 import os
+import sys
 import shlex
 import datetime
 
@@ -6,7 +7,8 @@ import builtins
 import plugins
 
 from lib.utils import Event
-from lib.docopt import docopt
+#from lib.docopt import docopt
+from lib import clip
 from lib.supers import *
 from brain import brain
 
@@ -29,6 +31,18 @@ class ShellException(Exception):
 	pass
 
 
+class StdStream(object):
+	def __init__(self, stream=None, redirect=False):
+		self._stream = sys.stdout if stream is None else stream
+		self._redirect = redirect
+
+	def write(self, message):
+		if self._redirect:
+			self._stream(message)
+		else:
+			self._stream.write(message)
+
+
 class Kernel(object):
 
 	def __init__(self):
@@ -39,9 +53,21 @@ class Kernel(object):
 			'clients': {}
 		}, self.context_change)
 
+		self.services = {}
+		self.register_service('cli', clip)
+
+		self._stdout = StdStream(self.out, redirect=True)
+		self._stderr = StdStream(self.err, redirect=True)
+
 	def context_change(self, record):
 		if record['name'] == 'cwd':
 			self._property_update('current_directory', self.context['cwd'])
+
+	def register_service(self, name, service):
+		self.services[name] = service
+
+	def get_service(self, name):
+		return self.services[name]
 
 
 	'''
@@ -96,12 +122,21 @@ class Kernel(object):
 	def throw(self, text):
 		raise ShellException(text)
 
-	def parse_command(self, f, docopt_args):
-		parsed_args = docopt(**docopt_args)
-		if isinstance(parsed_args, dict):
-			f(self, parsed_args)
-		else:
-			self.out(str(parsed_args))
+	def parse_command(self, module, args):
+		try:
+			cli = self.get_service('cli')
+			app = cli.App(stdout=self._stdout, stderr=self._stderr, module=module)
+			app.arg('--version', help='Print the version', action='version',
+				    version=module.__version__ if hasattr(module, '__version__') else 'No version provided')
+			f = module._run
+			f.func_globals['shell'] = self
+			f.func_globals['cli'] = app
+			try:
+				f(args)
+			except cli.ClipExit:
+				pass
+		except SystemExit:
+			pass
 
 
 	def run_command(self, command, args):
@@ -121,11 +156,7 @@ class Kernel(object):
 		plugin = plugins.get_plugin(command)
 		if plugin:
 			try:
-				self.parse_command(plugin.run, {
-					'doc': plugin.__doc__,
-					'argv': args,
-					'version': plugin.__version__ if hasattr(plugin, '__version__') else 'No version provided'
-				})
+				self.parse_command(plugin, args)
 			except ShellException, e:
 				self.err(str(e))
 			return True

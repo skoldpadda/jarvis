@@ -1,32 +1,28 @@
-config = {
-	'project': 'jarvis',
-	'tasks': {
-		'install_kernel': {
-			'name': 'Install Kernel',
-			'root': 'kernel',
-			'virtualenv': 'env',
-			'run': ['pip install sockjs-tornado'],
-			'freeze': 'requirements.txt'
-		},
-		'npm_root': {
-			'name': 'NPM root',
-			'run': ['npm install']
-		},
-		'npm_nw': {
-			'name': 'NPM node-webkit app',
-			'root': 'jarvis-nw',
-			'run': ['npm install']
-		},
-		'kernel': {
-			'name': 'Launch Kernel',
-			'virtualenv': 'kernel/env',
-			'run': ['python kernel']
-		},
-		'install': {
-			'run': ['install_kernel', 'npm_root', 'npm_nw']
-		},
-		'default': {
-			'run': ['kernel']
-		}
-	}
-}
+project = 'jarvis'
+
+def install_kernel():
+	'''Install Kernel'''
+	with strap.root('kernel'):
+		with strap.virtualenv('env'):
+			strap.run('pip install sockjs-tornado')
+			strap.freeze('requirements.txt')
+
+def npm_root():
+	'''NPM root'''
+	strap.run('npm install')
+
+def npm_nw():
+	'''NPM node-webkit app'''
+	with strap.root('jarvis-nw'):
+		strap.run('npm install')
+
+def kernel():
+	'''Launch Kernel'''
+	with strap.virtualenv('kernel/env'):
+		strap.run('python kernel')
+
+def install():
+	strap.run([install_kernel, npm_root, npm_nw])
+
+def default():
+	strap.run(kernel)
