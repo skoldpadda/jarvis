@@ -27,10 +27,10 @@ class ClipParser(ArgumentParser):
 	def __init__(self, *args, **kwargs):
 		self._stdout = kwargs.pop('stdout', sys.stdout)
 		self._stderr = kwargs.pop('stderr', sys.stderr)
-		if 'prog' not in kwargs:
-			module = kwargs.pop('module')
-			kwargs['prog'] = module.__name__
-			kwargs['description'] = module.__doc__
+		module = kwargs.pop('module', None)
+		if module:
+			kwargs.setdefault('prog', module.__name__)
+			kwargs.setdefault('description', module.__doc__)
 		ArgumentParser.__init__(self, *args, **kwargs)
 
 	def _print_message(self, message, file=None):
@@ -79,7 +79,8 @@ class App(object):
 			# Monkey-patch kwargs to pass stream info to subparser
 			kwargs['stdout'] = self._parser._stdout
 			kwargs['stderr'] = self._parser._stderr
-			kwargs['prog'] = subcommand
+			kwargs.setdefault('prog', subcommand)
+			kwargs.setdefault('description', func.__doc__)
 			subparser = self._subparsers.add_parser(subcommand, *args, **kwargs)
 			if alias:
 				if isinstance(alias, text_type):
@@ -141,6 +142,12 @@ class App(object):
 
 		if main is not None:
 			args.insert(0, main.__name__)
+			subparser = self._subparsers._name_parser_map[main.__name__]
+			# Add global args to subparser namespace
+			for a, k in self._global_args:
+				subparser.add_argument(*a, **k)
+			# Inherit description from parent module
+			subparser.description = self._parser.description
 
 		kwargs = vars(self._parser.parse_args(args=args, namespace=namespace))
 		sentinel = object()
