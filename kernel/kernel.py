@@ -6,9 +6,8 @@ import datetime
 import builtins
 import plugins
 
-from lib.utils import Event
-#from lib.docopt import docopt
 from lib import clip
+from lib.utils import Event
 from lib.supers import *
 from brain import brain
 
@@ -32,8 +31,8 @@ class ShellException(Exception):
 
 
 class StdStream(object):
-	def __init__(self, stream=None, redirect=False):
-		self._stream = sys.stdout if stream is None else stream
+	def __init__(self, stream=sys.stdout, redirect=False):
+		self._stream = stream
 		self._redirect = redirect
 
 	def write(self, message):
@@ -123,19 +122,16 @@ class Kernel(object):
 		raise ShellException(text)
 
 	def parse_command(self, module, args):
+		cli = self.get_service('cli')
 		try:
-			cli = self.get_service('cli')
 			app = cli.App(stdout=self._stdout, stderr=self._stderr, module=module)
 			app.arg('--version', help='Print the version', action='version',
-				    version=module.__version__ if hasattr(module, '__version__') else 'No version provided')
+			        version=module.__version__ if hasattr(module, '__version__') else 'No version provided')
 			f = module._run
 			f.func_globals['shell'] = self
 			f.func_globals['cli'] = app
-			try:
-				f(args)
-			except cli.ClipExit:
-				pass
-		except SystemExit:
+			f(args)
+		except (SystemExit, cli.ClipExit):
 			pass
 
 
@@ -143,25 +139,14 @@ class Kernel(object):
 
 		# @TODO: Handle aliases? (preprocessing of input)
 
-		# Is it a built-in function?
-		if hasattr(builtins, command):
-			f = getattr(builtins, command)
-			self.parse_command(f, {
-				'doc': f.__doc__,
-				'argv': args
-			})
-			return True
-
-		# Is it a script in the plugins/ directory?
-		plugin = plugins.get_plugin(command)
-		if plugin:
+		# Try to find the command as a builtin or plugin (fail-fast)
+		found_cmd = builtins.get_builtin(command) or plugins.get_plugin(command)
+		if found_cmd:
 			try:
-				self.parse_command(plugin, args)
+				self.parse_command(found_cmd, args)
 			except ShellException, e:
 				self.err(str(e))
 			return True
-
-
 
 		'''
 		# Is it a native shell command?
