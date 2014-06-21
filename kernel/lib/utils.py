@@ -1,4 +1,5 @@
 import os
+import sys
 import contextlib
 
 
@@ -28,6 +29,18 @@ class Event:
 	__isub__ = unhandle
 	__call__ = fire
 	__len__  = get_handler_count
+
+
+class StdStream(object):
+	def __init__(self, stream=sys.stdout, redirect=False):
+		self._stream = stream
+		self._redirect = redirect
+
+	def write(self, message):
+		if self._redirect:
+			self._stream(message)
+		else:
+			self._stream.write(message)
 
 
 @contextlib.contextmanager

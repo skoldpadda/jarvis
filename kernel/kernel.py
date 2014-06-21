@@ -1,5 +1,4 @@
 import os
-import sys
 import shlex
 import datetime
 
@@ -7,7 +6,7 @@ import builtins
 import plugins
 
 from lib import clip
-from lib.utils import Event
+from lib.utils import Event, StdStream
 from lib.supers import *
 from brain import brain
 
@@ -28,18 +27,6 @@ from brain import brain
 
 class ShellException(Exception):
 	pass
-
-
-class StdStream(object):
-	def __init__(self, stream=sys.stdout, redirect=False):
-		self._stream = stream
-		self._redirect = redirect
-
-	def write(self, message):
-		if self._redirect:
-			self._stream(message)
-		else:
-			self._stream.write(message)
 
 
 class Kernel(object):
