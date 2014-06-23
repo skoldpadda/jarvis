@@ -2,12 +2,12 @@ import os
 import shlex
 import datetime
 
+import clip
+from supers import *
+
 import builtins
 import plugins
-
-from lib import clip
 from lib.utils import Event, StdStream
-from lib.supers import *
 from brain import brain
 
 

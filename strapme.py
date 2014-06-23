@@ -4,7 +4,11 @@ def install_kernel():
 	'''Install Kernel'''
 	with strap.root('kernel'):
 		with strap.virtualenv('env'):
-			strap.run('pip install sockjs-tornado')
+			strap.run([
+				'pip install sockjs-tornado',
+				'pip install git+https://github.com/willyg302/clip.py.git@master',
+				'pip install git+https://github.com/willyg302/supers.py.git@master'
+			])
 			strap.freeze('requirements.txt')
 
 def npm_root():
