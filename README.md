@@ -49,7 +49,7 @@ The final application builds of jarvis will be located in `dist/` for each major
 
 ## Spec
 
-For more about the project's goals and design, see the [spec](spec.md).
+For more about the project's goals and design, see the [spec](docs/spec.md).
 
 ## Todo
 
