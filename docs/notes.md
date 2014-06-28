@@ -34,6 +34,7 @@ Shell
 
 ### Re-imagining the Shell
 
+- [TermKit](https://github.com/unconed/TermKit) by `@unconed`
 - [shotgun](https://github.com/chevex/shotgun) by `@chevex`
 - [nshell](https://github.com/visionmedia/nshell) by `@visionmedia`
 - [Cloud Commander](https://github.com/coderaiser/cloudcmd) by `@coderaiser`
@@ -73,3 +74,4 @@ Shell
 ### Ideas
 
 - Chris Granger on [the IDE as data](http://www.chris-granger.com/2013/01/24/the-ide-as-data/)
+- Bret Victor on [learnable programming](http://worrydream.com/#!/LearnableProgramming)

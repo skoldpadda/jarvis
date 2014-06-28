@@ -91,8 +91,4 @@ Clicking the jarvis icon to the left of the omnibar opens the Control Panel.
 
 ## References
 
-### Related Work
-
-- [TermKit](https://github.com/unconed/TermKit)
-- [Shotgun](https://github.com/chevex/shotgun)
-- [nshell](https://www.npmjs.org/package/nshell)
+References have been moved to [notes](notes.md). Please see that document for an extensive list of related work, as well as general useful links.
