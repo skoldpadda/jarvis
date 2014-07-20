@@ -3,6 +3,7 @@
 
 # ...except for these files
 !.gitignore
+!__init__.py
 !echo.py
 !jpm.py
 !sleep.py
