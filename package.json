@@ -8,10 +8,6 @@
     "type": "git",
     "url": "https://github.com/willyg302/jarvis"
   },
-  "scripts": {
-    "app": "nodewebkit jarvis-nw",
-    "deploy": "grunt"
-  },
   "dependencies": {
     "grunt": "~0.4.2",
     "grunt-node-webkit-builder": "~0.1.17",
