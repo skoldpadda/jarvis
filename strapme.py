@@ -11,16 +11,30 @@ def install_erlang_ubuntu():
 			'tar -xzvf otp_src_17.1.tar.gz'
 		])
 		with strap.root('otp_src_17.1'):
-			strap.run('./configure && make && make install')
+			strap.run('./configure').run('make').run('make install')
 
 def install_elixir_ubuntu():
 	with strap.root('/usr/bin'):
 		strap.run('git clone https://github.com/elixir-lang/elixir')
 		with strap.root('elixir'):
-			strap.run([
-				'git checkout v1.0.0',
-				'make && make install'
-			])
+			strap.run('git checkout v1.0.0').run('make').run('make install')
+
+def install_phoenix_ubuntu():
+	# Do this relative to jarvis install directory for now
+	with strap.root('..'):
+		strap.run('git clone https://github.com/phoenixframework/phoenix')
+		with strap.root('phoenix'):
+			strap.run('git checkout v0.4.1').run('mix do deps.get, compile')
+
+def install_orpheus():
+	'''Install Orpheus, the jarvis kernel'''
+	with strap.root('orpheus'):
+		strap.run('mix do deps.get, compile')
+
+def orpheus():
+	'''Start Orpheus, the jarvis kernel'''
+	with strap.root('orpheus'):
+		strap.run('mix phoenix.start')
 
 def build():
 	'''Build jarvis'''
