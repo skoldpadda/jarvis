@@ -20,7 +20,7 @@ Made it this far? Awesome. Now run that bad boy.
 strap
 ```
 
-At this point you can visit `localhost:8080` to see an in-browser reference implementation of the jarvis client.
+At this point you can visit `localhost:4000` to see an in-browser reference implementation of the jarvis client.
 
 ## Developing
 

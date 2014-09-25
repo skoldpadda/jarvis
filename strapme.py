@@ -1,10 +1,27 @@
+import platform
+
+
 project = 'jarvis'
 
+########################################
+# Install Tasks
+########################################
 
 def install_erlang_deps_ubuntu():
-	strap.run('apt-get install build-essential libncurses5-dev openssl libssl-dev fop xsltproc unixodbc-dev')
+	'''Ubuntu: Install Erlang dependencies'''
+	deps = [
+		'build-essential',
+		'libncurses5-dev',
+		'openssl',
+		'libssl-dev',
+		'fop',
+		'xsltproc',
+		'unixodbc-dev'
+	]
+	strap.run('apt-get install {}'.format(' '.join(deps)))
 
 def install_erlang_ubuntu():
+	'''Ubuntu: Install Erlang'''
 	with strap.root('/usr/bin'):
 		strap.run([
 			'wget http://erlang.org/download/otp_src_17.1.tar.gz',
@@ -14,17 +31,28 @@ def install_erlang_ubuntu():
 			strap.run('./configure').make().make('install')
 
 def install_elixir_ubuntu():
+	'''Ubuntu: Install Elixir'''
 	with strap.root('/usr/bin'):
 		strap.run('git clone https://github.com/elixir-lang/elixir')
 		with strap.root('elixir'):
 			strap.run('git checkout v1.0.0').make().make('install')
 
 def install_phoenix_ubuntu():
+	'''Ubuntu: Install Phoenix web framework'''
 	# Do this relative to jarvis install directory for now
 	with strap.root('..'):
 		strap.run('git clone https://github.com/phoenixframework/phoenix')
 		with strap.root('phoenix'):
 			strap.run('git checkout v0.4.1').run('mix do deps.get, compile')
+
+def install_ubuntu():
+	'''Ubuntu-specific installation'''
+	strap.run([
+		install_erlang_deps_ubuntu,
+		install_erlang_ubuntu,
+		install_elixir_ubuntu,
+		install_phoenix_ubuntu
+	])
 
 def install_orpheus():
 	'''Install Orpheus, the jarvis kernel'''
@@ -35,17 +63,34 @@ def post_install():
 	'''Run all post-installation tasks'''
 	pass
 
+########################################
+# Run Tasks
+########################################
+
 def orpheus():
 	'''Start Orpheus, the jarvis kernel'''
 	with strap.root('orpheus'):
 		strap.run('mix phoenix.start')
 
+########################################
+# Build Tasks
+########################################
+
+def build_client():
+	pass
+
+########################################
+# Base Tasks
+########################################
+
 def build():
-	'''Build jarvis'''
-	strap.node('gulp', module=True)
+	pass
 
 def install():
-	strap.npm('install')
+	system = platform.platform().lower()
+	if 'ubuntu' in system:
+		strap.run(install_ubuntu)
+	strap.run(install_orpheus).run(post_install)
 
 def default():
-	strap.node('index.js')
+	strap.run(orpheus)
