@@ -77,7 +77,8 @@ def orpheus():
 ########################################
 
 def build_client():
-	pass
+	with strap.root('client'):
+		strap.node('gulp', module=True)
 
 ########################################
 # Base Tasks
