@@ -12,6 +12,5 @@ defmodule Orpheus.Views do
   end
 
   # Functions defined here are available to all other views/templates
+  def title, do: "jarvis"
 end
-
-

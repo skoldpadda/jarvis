@@ -5,31 +5,32 @@ var minifycss  = require('gulp-minify-css');
 var uglify     = require('gulp-uglify');
 
 var paths = {
-	assets: [
-		'./app/img/**/*.*',
-		'./app/index.html'
-	],
-	app: './app',
-	dist: './dist',
-	js: './app/js',
-	less: './app/less/main.less'
+	css: {
+		src: './app/less/main.less',
+		dest: '../orpheus/priv/static/css'
+	},
+	assets: {
+		list: ['./app/img/**/*.*'],
+		base: './app',
+		dest: '../orpheus/priv/static'
+	}
 };
 
 gulp.task('clean', function() {
-	return gulp.src(paths.dist, {read: false})
-		.pipe(clean());
+	/*return gulp.src(paths.dist, {read: false})
+		.pipe(clean());*/
 });
 
 gulp.task('copy-assets', function() {
-	return gulp.src(paths.assets, {base: paths.app})
-		.pipe(gulp.dest(paths.dist));
+	return gulp.src(paths.assets.list, {base: paths.assets.base})
+		.pipe(gulp.dest(paths.assets.dest));
 });
 
 gulp.task('compile-css', function() {
-	return gulp.src(paths.less)
+	return gulp.src(paths.css.src)
 		.pipe(less())
 		.pipe(minifycss())
-		.pipe(gulp.dest(paths.dist));
+		.pipe(gulp.dest(paths.css.dest));
 });
 
 gulp.task('compile-js', function() {

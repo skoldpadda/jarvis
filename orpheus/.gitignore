@@ -1,4 +1,7 @@
-/_build
-/deps
+_build/
+deps/
 erl_crash.dump
 *.ez
+priv/static/*/*
+!.gitkeep
+!phoenix.js
