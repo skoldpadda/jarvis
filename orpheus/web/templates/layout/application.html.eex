@@ -10,5 +10,6 @@
 <body>
 	<%= @inner %>
 	<script src="/js/phoenix.js"></script>
+	<script src="/js/main.js"></script>
 </body>
 </html>

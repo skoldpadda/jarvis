@@ -1,5 +1,6 @@
 var gulp       = require('gulp');
 var clean      = require('gulp-clean');
+var concat     = require('gulp-concat');
 var less       = require('gulp-less');
 var minifycss  = require('gulp-minify-css');
 var uglify     = require('gulp-uglify');
@@ -8,6 +9,11 @@ var paths = {
 	css: {
 		src: './app/less/main.less',
 		dest: '../orpheus/priv/static/css'
+	},
+	js: {
+		src: ['./app/js/app.js'],
+		name: 'main.js',
+		dest: '../orpheus/priv/static/js'
 	},
 	assets: {
 		list: ['./app/img/**/*.*'],
@@ -34,7 +40,10 @@ gulp.task('compile-css', function() {
 });
 
 gulp.task('compile-js', function() {
-	// @TODO: Figure out how to go about doing this
+	return gulp.src(paths.js.src)
+		.pipe(concat(paths.js.name))
+		.pipe(uglify())
+		.pipe(gulp.dest(paths.js.dest));
 });
 
 gulp.task('default', ['clean'], function() {

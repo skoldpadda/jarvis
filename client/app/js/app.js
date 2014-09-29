@@ -1,56 +1,50 @@
-var shoe = require('shoe-bin');
-var through = require('through2');
+var chat = document.getElementById('jarvis-chat');
+var jarvisInput = document.getElementById('jarvis-input');
+var socket = new Phoenix.Socket('/kernel');
+var clientChannel = null;
 
+socket.join('client', 'echo', {}, function(channel) {
+	channel.on('return_event', function(message) {
+		jarvisMessage(message.data);
+	});
 
-var JARVIS = window.JARVIS = {
-	NAME: 'jarvis',
-	VERSION: '0.1.0',
-	DEBUG: true,
-};
+	channel.on('join', function(message) {
+		console.log(message);
+	});
 
-var conn = null;
+	clientChannel = channel;
+});
 
-
-function ctrlpanel() {
-	console.log('Clicked Control Panel!');
+function sendToKernel(message) {
+	if (clientChannel === null) {
+		return;
+	}
+	clientChannel.send('echo', {data: message});
 }
 
 
 /** MESSAGING **/
 
-// @TODO this is terrible
-function printMessage(message) {
-	var content = document.getElementById('content');
-	if (message.hasOwnProperty('tag')) {
-		content.innerHTML += '<span class="' + message.author + '">' + message.tag + ' &gt; </span>';
+function printMessage(author, message) {
+	if (author !== null) {
+		chat.innerHTML += '<span class="' + author.toLowerCase() + '">' + author + ' &gt; </span>';
 	}
-	content.innerHTML += (message.text + "\n");  // @TODO: Need newline here?
-	content.parentNode.scrollTop = content.parentNode.scrollHeight;
+	chat.innerHTML += (message + "\n");
+	chat.parentNode.scrollTop = chat.parentNode.scrollHeight;
 }
 
+
 function userMessage(message) {
-	printMessage({
-		'author': 'user',
-		'tag': 'User',
-		'text': message
-	});
-	conn.write(message);
+	printMessage('User', message);
+	sendToKernel(message);
 }
 
 function appMessage(message) {
-	printMessage({
-		'author': 'app',
-		'tag': 'App',
-		'text': message
-	});
+	printMessage('App', message);
 }
 
 function jarvisMessage(message) {
-	printMessage({
-		'author': 'jarvis',
-		'tag': JARVIS.NAME,
-		'text': message
-	});
+	printMessage('jarvis', message);
 }
 
 
@@ -60,32 +54,18 @@ function onInputBarKeypress(e) {
 	}
 	// Enter pressed?
 	if (e.keyCode === 10 || e.keyCode === 13) {
-		user_input = document.getElementById('inputbar').value;
-		document.getElementById('inputbar').value = '';
-		userMessage(user_input);
+		userInput = jarvisInput.value;
+		jarvisInput.value = '';
+		userMessage(userInput);
 	}
 }
 
 
 /** INITIALIZATION **/
 
-function initSockJS() {
-	appMessage('Connecting to kernel...');
-	conn = shoe('/kernel', function() {
-		jarvisMessage('Connected!');
-	});
-	conn.pipe(through(function(message, enc, next) {
-		printMessage({'text': message});
-		next();
-	}));
-}
+
 
 window.onload = function() {
-	document.querySelector('#btn-ctrlpanel .click').onclick = function() {
-		ctrlpanel();
-	}
-	document.getElementById('inputbar').onkeypress = onInputBarKeypress;
-	document.getElementById('inputbar').focus();
-
-	initSockJS();
+	jarvisInput.onkeypress = onInputBarKeypress;
+	jarvisInput.focus();
 };
