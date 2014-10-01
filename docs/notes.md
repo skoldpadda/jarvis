@@ -39,12 +39,28 @@ Shell
 - [nshell](https://github.com/visionmedia/nshell) by `@visionmedia`
 - [Cloud Commander](https://github.com/coderaiser/cloudcmd) by `@coderaiser`
 
-## Miscellaneous
+### The Internet of Things
 
-### Knowledge
+- [wit.ai](https://wit.ai/)
+- [Node-RED](https://github.com/node-red/node-red) by `@node-red`
 
-- For computational knowledge, use TheBigDB in the style of [Akiva](https://github.com/thebigdb/akiva)
-- Jeannie is an existing voice assistant with a great [REST API](https://www.mashape.com/pannous/jeannie) and related [GitHub project](https://github.com/pannous/jeannie-webclient)
+## Languages
+
+### Erlang/Elixir
+
+- [This](http://blog.glaucocustodio.com/2014/08/12/setting-up-an-elixir-erlang-development-environment-on-ubuntu/) helps you get all set on Ubuntu
+- [n2o](https://github.com/5HT/n2o) is an Erlang Websocket-powered server: see [slides about it](http://kukuruku.co/hub/erlang/n2o-erlang-web-framework) and its [use in Elixir](https://github.com/erlang-synrc/n2o.elixir)
+- See [Rise of the Phoenix](https://github.com/erlang-synrc/n2o.elixir) slides, especially the part about Phoenix Services
+
+### JavaScript
+
+- [Keypress](http://dmauro.github.io/Keypress/), a library for advanced keypress detection
+- [NeDB](https://github.com/louischatriot/nedb), an "embedded persistent database for node.js"
+
+### Node
+
+- [shoe-bin](https://github.com/substack/shoe-bin) is a wrapper of SockJS for use with streams
+- Use [node-trumpet](https://github.com/substack/node-trumpet) or [hyperstream](https://github.com/substack/hyperstream) to stream updates to the DOM
 
 ### Python
 
@@ -53,10 +69,13 @@ Shell
 - Interesting [SO question](http://stackoverflow.com/questions/4995419/in-python-how-do-i-know-when-a-process-is-finished) about process cleanup
 - [Blog post](http://honnibal.wordpress.com/2013/12/18/a-simple-fast-algorithm-for-natural-language-dependency-parsing/) about parsing English with 500 lines of Python
 
-### JavaScript
+## Miscellaneous
 
-- [Keypress](http://dmauro.github.io/Keypress/), a library for advanced keypress detection
-- [NeDB](https://github.com/louischatriot/nedb), an "embedded persistent database for node.js"
+### Knowledge
+
+- For computational knowledge, use TheBigDB in the style of [Akiva](https://github.com/thebigdb/akiva)
+- Jeannie is an existing voice assistant with a great [REST API](https://www.mashape.com/pannous/jeannie) and related [GitHub project](https://github.com/pannous/jeannie-webclient)
+- [NLUlite](https://nlulite.com/) "natural language parser and database"
 
 ### HTML5 Applications
 
@@ -70,8 +89,38 @@ Shell
     - A full-on [JSON editor](https://github.com/DavidDurman/FlexiJsonEditor), not quite necessary for form manipulation
     - [jquery.dform](https://github.com/daffl/jquery.dform), heavyweight library for full JSON backing
     - **Best one**: [JSON Editor](https://github.com/jdorn/json-editor) by `@jdorn`
+- [UI Gradients](http://uigradients.com/) provided the color schemes for the Orpheus, Apollo, and Charon logos
+- [This](http://zachholman.com/images/posts/chat.png) is what the chat should look like
+
+### Streams, etc.
+
+- [Stream Handbook](https://github.com/substack/stream-handbook)
+- [Communicating Sequential Processes](http://en.wikipedia.org/wiki/Communicating_sequential_processes) (CSP)
+    - Clojure data streaming philosophy (core.async)
+    - There's a nice blog post about [CSP in JavaScript](http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript), and the [js-csp GitHub repo](https://github.com/ubolonton/js-csp)
+    - [mori](http://swannodette.github.io/mori/) allows for persistent data structures in JS, since immutable data resolves a lot of issues with application state
+- Functional Reactive Programming (FRP)
+    - See the [Reactive Manifesto](http://www.reactivemanifesto.org/)
+    - [RxJS](https://github.com/Reactive-Extensions/RxJS) is an implementation of this philosophy
+    - Elm is a concurrent FRP language, see [this thing](https://gist.github.com/evancz/2b2ba366cae1887fe621) on Elm's architecture
+    - [This dissertation](http://www.cs.cornell.edu/~jnfoster/papers/jnfoster-dissertation.pdf) on "bidirectional programming" may be of use if it wasn't so dissertation-ey
+    - React is a loose implementation of FRP, and [Om](http://josf.info/blog/2014/09/18/first-ompressions-a-conceptual-look-at-om/) is Clojure + React
+- We can use CSP and FRP [together](http://stackoverflow.com/questions/20632512/comparing-core-async-and-functional-reactive-programming-rx): CSP separates concerns over processes (the "message passing"), while FRP handles propagating data once the underlying model changes
+
+### Worker Sandboxing
+
+- [jailed](https://github.com/asvd/jailed) provides a model for isolating spawned subprocesses with restricted privileges
+- You can proxy arbitrary code in some language to this [code runner](http://colabv6.dan.co.jp/lleval.html), see the Hubot script [eval.coffee](https://github.com/github/hubot-scripts/blob/master/src/scripts/eval.coffee) for an example usage
+- [Polyglot](https://github.com/sausheong/polyglot) has a model that allows for writing a worker in any language
+- See [neovim's plugin architecture](https://github.com/neovim/neovim/wiki/Plugin-UI-architecture) for a sense of how UI can be propagated to a client (neovim itself is headless)
 
 ### Ideas
 
 - Chris Granger on [the IDE as data](http://www.chris-granger.com/2013/01/24/the-ide-as-data/)
 - Bret Victor on [learnable programming](http://worrydream.com/#!/LearnableProgramming)
+- Martin Fowler on [microservices](http://martinfowler.com/articles/microservices.html)
+
+## Thoughts
+
+- msgpack vs. JSON?
+- Docker?
