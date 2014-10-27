@@ -45,13 +45,18 @@ def install_phoenix_ubuntu():
 		with strap.root('phoenix'):
 			strap.run('git checkout v0.4.1').run('mix do deps.get, compile')
 
+def install_client_ubuntu():
+	'''Ubuntu: Install client-specific dependencies'''
+	strap.run('apt-get install leiningen')
+
 def install_ubuntu():
 	'''Ubuntu-specific installation'''
 	strap.run([
 		install_erlang_deps_ubuntu,
 		install_erlang_ubuntu,
 		install_elixir_ubuntu,
-		install_phoenix_ubuntu
+		install_phoenix_ubuntu,
+		install_client_ubuntu
 	])
 
 def install_orpheus():
