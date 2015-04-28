@@ -32,6 +32,7 @@ Shell
 - [LISA](https://github.com/Seraf/LISA) by `@Seraf`
 - [Jarvis](https://github.com/debugger22/Jarvis) by `@debugger22`
 - [Home Assistant](https://github.com/balloob/home-assistant) by `@balloob`
+- [Sirius](https://github.com/jhauswald/sirius) by `@jhauswald`
 
 ### Re-imagining the Shell
 
@@ -53,7 +54,7 @@ Shell
 ### Erlang/Elixir
 
 - [This](http://blog.glaucocustodio.com/2014/08/12/setting-up-an-elixir-erlang-development-environment-on-ubuntu/) helps you get all set on Ubuntu
-- [n2o](https://github.com/5HT/n2o) is an Erlang Websocket-powered server: see [slides about it](http://kukuruku.co/hub/erlang/n2o-erlang-web-framework) and its [use in Elixir](https://github.com/erlang-synrc/n2o.elixir)
+- [n2o](https://github.com/5HT/n2o) is an Erlang Websocket-powered server: see [slides about it](http://kukuruku.co/hub/erlang/n2o-erlang-web-framework), its [use in Elixir](https://github.com/erlang-synrc/n2o.elixir), and a [reference manual](https://synrc.com/apps/n2o/doc/book.pdf)
 - See [Rise of the Phoenix](https://github.com/erlang-synrc/n2o.elixir) slides, especially the part about Phoenix Services
 - [Python for distributed Erlang](https://github.com/lfex/py)
 - [**Huge list of Erlang bookmarks**](https://github.com/0xAX/erlang-bookmarks/blob/master/ErlangBookmarks.md)
@@ -100,6 +101,7 @@ Shell
     - **Best one**: [JSON Editor](https://github.com/jdorn/json-editor) by `@jdorn`
 - [UI Gradients](http://uigradients.com/) provided the color schemes for the Orpheus, Apollo, and Charon logos
 - [This](http://zachholman.com/images/posts/chat.png) is what the chat should look like
+- [Let's Chat](https://github.com/sdelements/lets-chat), another good reference for the main UI interface
 
 ### Streams, etc.
 
@@ -121,6 +123,7 @@ Shell
     - See [ShareJS](http://sharejs.org/) and [Derby](http://derbyjs.com/)
 - [Flow-based Programming](http://www.jpaulmorrison.com/fbp/)
     - Leads to [NoFlo](http://noflojs.org/) and [Flowhub](https://flowhub.io/)
+- [websocketd](http://websocketd.com/) WebSocket daemon that takes any UNIX process and WebSocket-ify's it
 
 ### Worker Sandboxing
 
@@ -128,6 +131,12 @@ Shell
 - You can proxy arbitrary code in some language to this [code runner](http://colabv6.dan.co.jp/lleval.html), see the Hubot script [eval.coffee](https://github.com/github/hubot-scripts/blob/master/src/scripts/eval.coffee) for an example usage
 - [Polyglot](https://github.com/sausheong/polyglot) has a model that allows for writing a worker in any language
 - See [neovim's plugin architecture](https://github.com/neovim/neovim/wiki/Plugin-UI-architecture) for a sense of how UI can be propagated to a client (neovim itself is headless)
+
+### Distributed Systems
+
+- [Matrix](http://matrix.org/) open standard for decentralized communication
+- [IPFS](http://ipfs.io/) "Permanent Web" peer-to-peer hypermedia protocol
+- [Mesh](https://github.com/mojo-js/mesh.js) universal interface for communicating with data sources
 
 ### Unix
 

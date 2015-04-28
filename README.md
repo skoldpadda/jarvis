@@ -1,6 +1,6 @@
 ![jarvis](https://raw.github.com/willyg302/jarvis/master/media/jarvis-logo.png "Sometimes you have to run before you can walk")
 
----
+-----
 
 **Just A Really Very Idiotic Shell** -- version 0.1.0
 

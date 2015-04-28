@@ -1,6 +1,6 @@
-![jarvis](https://raw.github.com/willyg302/jarvis/master/media/orpheus-logo.png "Orpheus")
+![Orpheus](https://raw.github.com/willyg302/jarvis/master/media/orpheus-logo.png "Orpheus")
 
----
+-----
 
 Orpheus is the jarvis kernel.
 
