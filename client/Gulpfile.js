@@ -1,9 +1,14 @@
 var gulp       = require('gulp');
 var clean      = require('gulp-clean');
-var concat     = require('gulp-concat');
 var less       = require('gulp-less');
 var minifycss  = require('gulp-minify-css');
 var uglify     = require('gulp-uglify');
+
+var browserify = require('browserify');
+var coffeeify  = require('coffeeify');
+var buffer     = require('vinyl-buffer');
+var vinyl      = require('vinyl-source-stream');
+
 
 var paths = {
 	css: {
@@ -11,7 +16,7 @@ var paths = {
 		dest: '../orpheus/priv/static/css'
 	},
 	js: {
-		src: ['./app/js/app.js'],
+		src: ['./app/js/main.coffee'],
 		name: 'main.js',
 		dest: '../orpheus/priv/static/js'
 	},
@@ -40,8 +45,11 @@ gulp.task('compile-css', function() {
 });
 
 gulp.task('compile-js', function() {
-	return gulp.src(paths.js.src)
-		.pipe(concat(paths.js.name))
+	return browserify(paths.js.src)
+		.transform(coffeeify)
+		.bundle()
+		.pipe(vinyl(paths.js.name))
+		.pipe(buffer())
 		.pipe(uglify())
 		.pipe(gulp.dest(paths.js.dest));
 });
