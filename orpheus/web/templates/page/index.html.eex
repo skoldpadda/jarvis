@@ -1,9 +1,9 @@
 <div class="jarvis-body">
-    <div id="jarvis-chat"></div>
+	<div id="jarvis-chat"></div>
 </div>
 <div class="jarvis-footer">
-    <section>
-        <div><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000"></div>
-        <div><input id="jarvis-input" type="text" autocomplete="off"></div>
-    </section>
+	<section>
+		<div><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000"></div>
+		<div><input id="jarvis-input" type="text" autocomplete="off"></div>
+	</section>
 </div>

@@ -4,7 +4,9 @@ socket = new Phoenix.Socket '/kernel'
 clientChannel = null
 
 
-socket.join 'client', 'echo', {}, (channel) ->
+socket.connect()
+
+socket.join('client:echo', {}).receive 'ok', (channel) ->
 	channel.on 'return_event', (message) ->
 		jarvisMessage message.data
 
@@ -16,7 +18,7 @@ socket.join 'client', 'echo', {}, (channel) ->
 sendToKernel = (message) ->
 	if not clientChannel?
 		return
-	clientChannel.send 'echo', { data: message }
+	clientChannel.push 'echo', { data: message }
 
 
 # MESSAGING

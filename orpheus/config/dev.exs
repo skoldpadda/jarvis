@@ -1,18 +1,34 @@
 use Mix.Config
 
-config :phoenix, Orpheus.Router,
-  port: System.get_env("PORT") || 4000,
-  ssl: false,
-  host: "localhost",
-  cookies: true,
-  session_key: "_orpheus_key",
-  session_secret: "9(HC1B11&6B4KLBO0^+EV26_0YMXI$TKOP1_DE6GW911*_O1*8^W!PZ#4Z&IH7@_QL2C6!#1",
-  debug_errors: true
+# For development, we disable any cache and enable
+# debugging and code reloading.
+#
+# The watchers configuration can be used to run external
+# watchers to your application. For example, we use it
+# with brunch.io to recompile .js and .css sources.
+config :orpheus, Orpheus.Endpoint,
+  http: [port: 4000],
+  debug_errors: true,
+  code_reloader: true,
+  cache_static_lookup: false,
+  watchers: []
 
-config :phoenix, :code_reloader,
-  enabled: true
+# Watch static and templates for browser reloading.
+config :orpheus, Orpheus.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+      ~r{web/views/.*(ex)$},
+      ~r{web/templates/.*(eex)$}
+    ]
+  ]
 
-config :logger, :console,
-  level: :debug
+# Do not include metadata nor timestamps in development logs
+config :logger, :console, format: "[$level] $message\n"
 
-
+# Configure your database
+config :orpheus, Orpheus.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "orpheus_dev"

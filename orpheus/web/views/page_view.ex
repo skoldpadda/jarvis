@@ -1,4 +1,3 @@
 defmodule Orpheus.PageView do
-  use Orpheus.Views
-
+  use Orpheus.Web, :view
 end

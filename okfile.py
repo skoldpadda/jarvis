@@ -7,7 +7,7 @@ project = 'jarvis'
 
 def install_phoenix():
 	'''Install Phoenix web framework'''
-	ok.mix('archive.install https://github.com/phoenixframework/phoenix/releases/download/v0.11.0/phoenix_new-0.11.0.ez')
+	ok.mix('archive.install https://github.com/phoenixframework/phoenix/releases/download/v0.12.0/phoenix_new-0.12.0.ez')
 
 def install_orpheus():
 	'''Install Orpheus, the jarvis kernel'''
@@ -31,7 +31,7 @@ def post_install():
 def orpheus():
 	'''Start Orpheus, the jarvis kernel'''
 	with ok.root('orpheus'):
-		ok.mix('phoenix.start')
+		ok.mix('phoenix.server')
 
 
 ########################################

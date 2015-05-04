@@ -1,18 +1,27 @@
 defmodule Orpheus.ClientChannel do
-	use Phoenix.Channel
+	use Orpheus.Web, :channel
 
-	def join(socket, "echo", message) do
+	def join("client:echo", auth_msg, socket) do
 		IO.puts "Someone's joining echo!"
-		reply socket, "join", %{content: "Joined echo successfully"}
+		send self, :after_join
 		{:ok, socket}
 	end
 
-	def join(socket, _no, _message) do
-		{:error, socket, :unauthorized}
+	def join("client:" <> _operation, auth_msg, socket) do
+		:ignore
 	end
 
-	def event(socket, "echo", message) do
-		reply socket, "return_event", message
-		socket
+	def handle_in("echo", %{"data" => ""}, socket) do
+		{:noreply, socket}
+	end
+
+	def handle_in("echo", message, socket) do
+		push socket, "return_event", message
+		{:noreply, socket}
+	end
+
+	def handle_info(:after_join, socket) do
+		push socket, "join", %{content: "Joined echo successfully"}
+		{:noreply, socket}
 	end
 end
