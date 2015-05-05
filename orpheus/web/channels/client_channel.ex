@@ -3,15 +3,19 @@ defmodule Orpheus.ClientChannel do
 
 	def join("client:echo", auth_msg, socket) do
 		IO.puts "Someone's joining echo!"
-		send self, :after_join
+		send self, %{after_join: "echo"}
 		{:ok, socket}
 	end
 
-	def join("client:" <> _operation, auth_msg, socket) do
+	def join("client:" <> module, auth_msg, socket) do
 		:ignore
 	end
 
-	def handle_in("echo", %{"data" => ""}, socket) do
+	@doc """
+	Swallow empty input. Ideally client implementations should handle this,
+	but we do it here to reduce the chance of false positives.
+	"""
+	def handle_in(_, %{"data" => ""}, socket) do
 		{:noreply, socket}
 	end
 
@@ -20,8 +24,8 @@ defmodule Orpheus.ClientChannel do
 		{:noreply, socket}
 	end
 
-	def handle_info(:after_join, socket) do
-		push socket, "join", %{content: "Joined echo successfully"}
+	def handle_info(%{:after_join => module}, socket) do
+		push socket, "join", %{data: "Successfully joined " <> module}
 		{:noreply, socket}
 	end
 end

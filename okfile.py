@@ -44,6 +44,18 @@ def build_client():
 
 
 ########################################
+# Test Tasks
+########################################
+
+def test_orpheus():
+	with ok.root('orpheus'):
+		ok.mix('test')
+
+def test():
+	ok.run([test_orpheus])
+
+
+########################################
 # Base Tasks
 ########################################
 

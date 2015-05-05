@@ -1,8 +1,8 @@
 defmodule Orpheus.PageControllerTest do
-  use Orpheus.ConnCase
+	use Orpheus.ConnCase, async: true
 
-  test "GET /" do
-    conn = get conn(), "/"
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
-  end
+	test "GET /" do
+		conn = get conn(), "/"
+		assert html_response(conn, 200) =~ "<title>jarvis</title>"
+	end
 end

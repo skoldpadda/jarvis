@@ -11,7 +11,7 @@ socket.join('client:echo', {}).receive 'ok', (channel) ->
 		jarvisMessage message.data
 
 	channel.on 'join', (message) ->
-		console.log message
+		console.log message.data
 
 	clientChannel = channel
 
