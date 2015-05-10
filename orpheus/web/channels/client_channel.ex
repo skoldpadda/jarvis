@@ -1,14 +1,17 @@
 defmodule Orpheus.ClientChannel do
 	use Orpheus.Web, :channel
 
-	def join("client:echo", auth_msg, socket) do
-		IO.puts "Someone's joining echo!"
-		send self, %{after_join: "echo"}
-		{:ok, socket}
-	end
-
+	# @TODO: Check out https://github.com/bbense/pluginator
 	def join("client:" <> module, auth_msg, socket) do
-		:ignore
+		IO.puts "Attempting to join " <> module
+		# Load module in cache
+		module_path = "../modules/" <> module <> "/server"
+		if File.exists?(module_path <> "/main.ex") do
+			send self, %{after_join: module}
+			{:ok, socket}
+		else
+			{:error, socket, :module_not_found}
+		end
 	end
 
 	@doc """
@@ -19,8 +22,14 @@ defmodule Orpheus.ClientChannel do
 		{:noreply, socket}
 	end
 
-	def handle_in("echo", message, socket) do
-		push socket, "return_event", message
+	def handle_in(module, message, socket) do
+		# @TODO This is terrible because it loads the thing every time
+		#       We had to do this for now because Elixir's immutable state sucks
+		module_path = "../modules/" <> module <> "/server"
+		loaded_module = elem(Code.load_file("main.ex", module_path) |> List.first, 0)
+		if loaded_module do
+			push socket, "return_event", loaded_module.run(message)
+		end
 		{:noreply, socket}
 	end
 
