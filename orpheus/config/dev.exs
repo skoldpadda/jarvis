@@ -19,6 +19,7 @@ config :orpheus, Orpheus.Endpoint,
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
       ~r{web/views/.*(ex)$},
+      ~r{web/channels/.*(ex)$},  # @willyg302: Easier this way
       ~r{web/templates/.*(eex)$}
     ]
   ]

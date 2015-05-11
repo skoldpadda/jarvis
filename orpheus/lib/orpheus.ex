@@ -15,6 +15,9 @@ defmodule Orpheus do
       # worker(Orpheus.Worker, [arg1, arg2, arg3]),
     ]
 
+    # Create module registry
+    :ets.new(:module_registry, [:named_table, :public])
+
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Orpheus.Supervisor]
