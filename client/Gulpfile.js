@@ -6,6 +6,7 @@ var uglify     = require('gulp-uglify');
 
 var browserify = require('browserify');
 var coffeeify  = require('coffeeify');
+var riotify    = require('riotify');
 var buffer     = require('vinyl-buffer');
 var vinyl      = require('vinyl-source-stream');
 
@@ -47,6 +48,7 @@ gulp.task('compile-css', function() {
 gulp.task('compile-js', function() {
 	return browserify(paths.js.src)
 		.transform(coffeeify)
+		.transform(riotify, { type: 'coffeescript' })
 		.bundle()
 		.pipe(vinyl(paths.js.name))
 		.pipe(buffer())

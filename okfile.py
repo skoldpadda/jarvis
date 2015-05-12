@@ -53,8 +53,11 @@ def test_orpheus():
 	with ok.root('orpheus'):
 		ok.mix('test')
 
+def test_modules():
+	ok.run('elixir `find modules -name "*.exs"`')
+
 def test():
-	ok.run([test_orpheus])
+	ok.run([test_orpheus, test_modules])
 
 
 ########################################

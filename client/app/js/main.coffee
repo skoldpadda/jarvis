@@ -1,7 +1,17 @@
+riot = require 'riot'
+require './chat.tag'
+
+
+chatObserver = riot.observable()
+riot.mount 'chat', chatObserver
+
+
 chat = document.getElementById 'jarvis-chat'
 jarvisInput = document.getElementById 'jarvis-input'
 socket = new Phoenix.Socket '/kernel'
 clientChannel = null
+
+
 
 
 socket.connect()
@@ -24,9 +34,10 @@ sendToKernel = (message) ->
 # MESSAGING
 
 printMessage = (author, message) ->
-	if author?
-		chat.innerHTML += "<span class=\"#{author.toLowerCase()}\">#{author} &gt; </span>"
-	chat.innerHTML += "#{message}\n"
+	chatObserver.trigger 'message', {
+		author: author,
+		message: message
+	}
 	chat.parentNode.scrollTop = chat.parentNode.scrollHeight
 
 userMessage = (message) ->

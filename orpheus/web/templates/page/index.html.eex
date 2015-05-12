@@ -1,5 +1,7 @@
 <div class="jarvis-body">
-	<div id="jarvis-chat"></div>
+	<div id="jarvis-chat">
+		<chat></chat>
+	</div>
 </div>
 <div class="jarvis-footer">
 	<section>
