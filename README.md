@@ -2,7 +2,9 @@
 
 -----
 
-**Just A Really Very Idiotic Shell** -- version 0.1.0
+![version 0.1.0](https://img.shields.io/badge/version-0.1.0-blue.svg?style=flat-square)
+
+> Just A Really Very Idiotic Shell
 
 jarvis is for me, not you (at least at the moment). If you have somehow stumbled upon this repo, hurry along and pay it no heed.
 
@@ -17,7 +19,7 @@ See the [installation guide](docs/installation-guide.md).
 Made it this far? Awesome. Now run that bad boy.
 
 ```bash
-strap
+ok
 ```
 
 At this point you can visit `localhost:4000` to see an in-browser reference implementation of the jarvis client.
